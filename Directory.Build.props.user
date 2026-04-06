@@ -1,0 +1,12 @@
+<Project>
+	<!-- Directory.Build.props から使用されます -->
+	<PropertyGroup Condition="'$(MSBuildProjectName)' == 'Elin.Plugin.Main'">
+		<!--
+		Mod のプログラム名を指定
+		Mod フォルダ名と DLL 名に使用されます
+		-->
+		<AssemblyName>PluginReloader</AssemblyName>
+	</PropertyGroup>
+
+	<!-- 以下自由に設定してください -->
+</Project>

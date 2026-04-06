@@ -1,0 +1,34 @@
+{
+  "$schema": "./dev-items/localization.schema.json",
+  "general": {
+    "helloWorld": {
+      "JP": "こんにちは世界",
+      "EN": "Hello World",
+      "CN": "你好，世界"
+    },
+    "modSampleLabel": {
+      "JP": "[Mod例]",
+      "EN": "[Mod Sample]",
+      "CN": "[Mod示例]"
+    }
+  },
+  "format": {
+    "helloFormat": {
+      "JP": "${A} + ${B} = ${C}",
+      "EN": "${A} + ${B} = ${C}",
+      "CN": "${A} + ${B} = ${C}",
+      "parameters": {
+        "A": {
+          "type": "int"
+        },
+        "B": {
+          "type": "int"
+        },
+        "C": {
+          "type": "int",
+          "format": "N0"
+        }
+      }
+    }
+  }
+}

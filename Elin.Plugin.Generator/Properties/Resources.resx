@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="EPG001_A_Title" xml:space="preserve">
+    <value>Cannot apply attribute to a nested type</value>
+  </data>
+  <data name="EPG002_A_Title" xml:space="preserve">
+    <value>Virtual is not allowed on properties of class types</value>
+  </data>
+  <data name="EPG003_A_Title" xml:space="preserve">
+    <value>An unsupported type is used as a setting</value>
+  </data>
+  <data name="EPG004_A_Title" xml:space="preserve">
+    <value>Element type does not match the declared type</value>
+  </data>
+  <data name="EPG005_A_Title" xml:space="preserve">
+    <value>Named arguments are not used</value>
+  </data>
+  <data name="EPG006_A_Title" xml:space="preserve">
+    <value>Parameters are not used</value>
+  </data>
+  <data name="EPG007_A_Title" xml:space="preserve">
+    <value>Invalid parameter definition</value>
+  </data>
+  <data name="EPG008_A_Title" xml:space="preserve">
+    <value>Parameter count does not match</value>
+  </data>
+  <data name="EPG009_A_Title" xml:space="preserve">
+    <value>Parameters are not defined</value>
+  </data>
+  <data name="EPG010_A_Title" xml:space="preserve">
+    <value>Parameters do not match the base language</value>
+  </data>
+  <data name="EPG001_B_Message" xml:space="preserve">
+    <value>'{0}' is a nested type. Because attribute '{1}' cannot be applied to nested types.</value>
+  </data>
+  <data name="EPG002_B_Message" xml:space="preserve">
+    <value>The property '{1}' of {0} is marked as virtual. Due to constraints of the generated internal code.</value>
+  </data>
+  <data name="EPG003_B_Message" xml:space="preserve">
+    <value>The property '{1}' of {0} has a type ({2}) that cannot be used as settings data</value>
+  </data>
+  <data name="EPG004_B_Message" xml:space="preserve">
+    <value>You cannot specify '{1}' as the range value for {0}</value>
+  </data>
+  <data name="EPG005_B_Message" xml:space="preserve">
+    <value>You must call the method using named arguments. Due to limitations of the definition file.</value>
+  </data>
+  <data name="EPG006_B_Message" xml:space="preserve">
+    <value>[{0}] '{1}' does not use any parameters</value>
+  </data>
+  <data name="EPG007_B_Message" xml:space="preserve">
+    <value>[{0}] No parameters are defined for '{1}'. You must define {1}.parameters.</value>
+  </data>
+  <data name="EPG008_B_Message" xml:space="preserve">
+    <value>[{0}] The number of parameters in the '{1}' message ({2}) does not match the number of properties in {1}.parameters ({3})</value>
+  </data>
+  <data name="EPG009_B_Message" xml:space="preserve">
+    <value>[{0}] The parameter '{2}' in the '{1}' message must be defined as {1}.parameters.{2}</value>
+  </data>
+  <data name="EPG010_B_Message" xml:space="preserve">
+    <value>[{0}] The message parameter '{2}' in the base language for '{1}' must also be included for language '{3}'</value>
+  </data>
+  <data name="EPG011_A_Title" xml:space="preserve">
+    <value>Assembly name is not configured</value>
+  </data>
+  <data name="EPG011_B_Message" xml:space="preserve">
+    <value>Please set the assembly name in Directory.Build.props.user</value>
+  </data>
+</root>

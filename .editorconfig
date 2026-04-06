@@ -1,0 +1,24 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+spelling_checkable_types = strings,identifiers,comments
+spelling_exclusion_path = .\exclusion.dic
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.cs]
+dotnet_diagnostic.CS1591.severity = none
+
+[*.md]
+indent_style = space
+trim_trailing_whitespace = false
+
+[*.xhtml]
+indent_style = tab
+
+[*.{ps1,psm1,psd1}]
+charset = utf-8-bom
+indent_style = tab
+indent_size = 4

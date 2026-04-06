@@ -1,0 +1,24 @@
+{
+  "profiles": {
+    "Steam": {
+      "commandName": "Executable",
+      "executablePath": "$(SteamPath)\\Steam.exe ",
+      "commandLineArgs": "-applaunch 2135150"
+    },
+    "DLL: 1.準備": {
+      "commandName": "Executable",
+      "executablePath": "powershell",
+      "commandLineArgs": "-NoProfile\r\n-NonInteractive\r\n-ExecutionPolicy Bypass\r\n-File $(SolutionDir)\\dev-items\\debug-dll.ps1\r\n-Mode prepare\r\n-ElinPath \"$(ElinPath)\""
+    },
+    "DLL: 2.デバッグ版に切り替え": {
+      "commandName": "Executable",
+      "executablePath": "powershell",
+      "commandLineArgs": "-NoProfile\r\n-NonInteractive\r\n-ExecutionPolicy Bypass\r\n-File $(SolutionDir)\\dev-items\\debug-dll.ps1\r\n-Mode dev\r\n-ElinPath \"$(ElinPath)\""
+    },
+    "DLL: 3.製品版に切り替え": {
+      "commandName": "Executable",
+      "executablePath": "powershell",
+      "commandLineArgs": "-NoProfile\r\n-NonInteractive\r\n-ExecutionPolicy Bypass\r\n-File $(SolutionDir)\\dev-items\\debug-dll.ps1\r\n-Mode prd\r\n-ElinPath \"$(ElinPath)\""
+    }
+  }
+}

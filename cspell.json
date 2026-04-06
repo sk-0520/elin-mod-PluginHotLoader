@@ -1,0 +1,31 @@
+{
+	// プロジェクト全体のスペルチェック設定ファイルです
+	"version": "0.2",
+	"language": "ja",
+	"dictionaries": [
+		"vs_exclusion",
+		"csharp",
+		"typescript",
+		"react",
+		"node",
+		"powershell",
+		"softwareTerms",
+		"en-US",
+		"ja-jp"
+	],
+	"ignorePaths": [
+		"**/bin/**",
+		"**/obj/**",
+		"**/node_modules/**",
+		"**/output/**",
+		"**/*.min.*"
+	],
+	"dictionaryDefinitions": [
+		{
+			"name": "vs_exclusion",
+			"path": "./exclusion.dic"
+		}
+	],
+	"ignoreRegExpList": [
+	]
+}

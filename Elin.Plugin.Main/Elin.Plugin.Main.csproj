@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<Sdk Name="Microsoft.NET.Sdk" />
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Elin.Plugin.Generator\Elin.Plugin.Generator.csproj">
+			<OutputItemType>Analyzer</OutputItemType>
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+		</ProjectReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="**\*.ModTemplate.cs">
+			<DependentUpon>$([System.String]::Copy('%(Filename)').Replace('.ModTemplate','')).cs</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<AdditionalFiles Include="..\Plugin.json" />
+		<AdditionalFiles Include="..\Localization.json" />
+		<CompilerVisibleProperty Include="ElinPath" />
+		<CompilerVisibleProperty Include="AssemblyName" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Using Include="UnityEngine" />
+	</ItemGroup>
+
+	<Target Name="RemoveFiles" BeforeTargets="BeforeBuild">
+		<RemoveDir Directories="$(TargetDir)" />
+		<RemoveDir Directories="$(ModPath)" />
+	</Target>
+
+	<Target Name="ExtractPackageXml" AfterTargets="AfterBuild">
+		<Message Text="ExtractPackageXml: $(AssemblyName)" Importance="Normal" />
+		<Exec Command="powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(SolutionDir)\dev-items\extract-package-xml.ps1&quot; -Assembly &quot;$(ProjectDir)\$(OutputPath)$(AssemblyName).dll&quot; -Out &quot;$(ProjectDir)@Assets\package.xml&quot;" WorkingDirectory="$(SolutionDir)" IgnoreExitCode="false" />
+	</Target>
+
+	<Target Name="BuildModHelp" AfterTargets="AfterBuild" DependsOnTargets="ExtractPackageXml" Condition="Exists('$(ProjectDir)\@Assets\ModHelp\help.xhtml')">
+		<Message Text="BuildModHelp: $(AssemblyName)" Importance="Normal" />
+		<Exec Command="powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(SolutionDir)\dev-items\build-mod-help-xml.ps1&quot; -Source &quot;$(ProjectDir)\@Assets\ModHelp&quot; -Out &quot;$(ProjectDir)@Assets&quot;" WorkingDirectory="$(SolutionDir)" IgnoreExitCode="false" />
+	</Target>
+
+	<Target Name="CopyFiles" AfterTargets="AfterBuild" DependsOnTargets="BuildModHelp">
+		<MakeDir Directories="$(ModPath)" />
+
+		<ItemGroup>
+			<Dlls Include="$(TargetDir)\**\*" Exclude="$(TargetDir)\$(AssemblyName).xml" />
+		</ItemGroup>
+		<Copy SourceFiles="@(Dlls)" DestinationFolder="$(ModPath)" />
+
+		<ItemGroup>
+			<ModAssets Include="@Assets\**\*" Exclude="@Assets\**\.gitkeep;@Assets\ModHelp\**\*" />
+		</ItemGroup>
+		<Copy SourceFiles="@(ModAssets)" DestinationFolder="$(ModPath)\%(ModAssets.RecursiveDir)" />
+	</Target>
+
+</Project>

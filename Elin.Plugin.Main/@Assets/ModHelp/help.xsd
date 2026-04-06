@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="help"
+           xmlns:help="help"
+           elementFormDefault="qualified">
+
+  <xs:element name="title">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element ref="help:text" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="text">
+    <xs:complexType>
+      <xs:attribute name="jp" type="xs:string" use="required"/>
+      <xs:attribute name="en" type="xs:string" use="required"/>
+      <xs:attribute name="cn" type="xs:string" use="optional"/>
+      <xs:attribute name="zhtw" type="xs:string" use="optional"/>
+      <xs:attribute name="kr" type="xs:string" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+
+
+
+  <xs:element name="center" type="xs:anyType"/>
+
+  <xs:element name="topic">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element ref="help:text" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="key">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element ref="help:text" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="value">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element ref="help:style" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="help:text" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="pair">
+    <xs:complexType>
+      <xs:sequence maxOccurs="unbounded">
+        <xs:element ref="help:key"/>
+        <xs:element ref="help:value"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="item">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element ref="help:style" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="help:text" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="list">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="help:item" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="q">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element ref="help:style" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="help:text" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="a">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element ref="help:style" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="help:text" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="qa">
+    <xs:complexType>
+      <xs:sequence maxOccurs="unbounded">
+        <xs:element ref="help:q"/>
+        <xs:element ref="help:a"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="link">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element ref="help:text" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="href" type="xs:anyURI" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="image">
+    <xs:complexType>
+      <xs:attribute name="src" type="xs:anyURI" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="p">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="help:style"/>
+        <xs:element ref="help:text"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="br">
+    <xs:complexType>
+      <xs:attribute name="value" type="xs:int" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- page element used in the document -->
+  <xs:element name="page">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="help:title" minOccurs="1" maxOccurs="1"/>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element ref="help:center"/>
+            <xs:element ref="help:style"/>
+          <xs:element ref="help:topic"/>
+          <xs:element ref="help:pair"/>
+          <xs:element ref="help:list"/>
+          <xs:element ref="help:qa"/>
+          <xs:element ref="help:link"/>
+          <xs:element ref="help:image"/>
+          <xs:element ref="help:p"/>
+          <xs:element ref="help:br"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+    <xs:element name="style">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element ref="help:text" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="value" type="xs:int" use="optional"/>
+        <xs:attribute name="color" type="xs:string" use="optional"/>
+        <xs:attribute name="bold" type="xs:boolean" use="optional"/>
+        <xs:attribute name="italic" type="xs:boolean" use="optional"/>
+      </xs:complexType>
+    </xs:element>
+
+</xs:schema>

@@ -1,0 +1,105 @@
+body {
+	margin: 0;
+	font-family: "Segoe UI", "Meiryo", sans-serif;
+	background: #f4f6f8;
+	color: #1c2128;
+}
+
+.help-app {
+	max-width: 960px;
+	margin: 0 auto;
+	padding: 16px;
+}
+
+.help-toolbar {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background: #ffffff;
+	border: 1px solid #d0d7de;
+	border-radius: 8px;
+	padding: 10px 12px;
+	margin-bottom: 12px;
+}
+
+.help-lang {
+	border: 1px solid #8c959f;
+	border-radius: 6px;
+	padding: 4px 8px;
+	background: #fff;
+}
+
+.help-content {
+	display: grid;
+	gap: 12px;
+}
+
+.help-page {
+	background: #fff;
+	border: 1px solid #d0d7de;
+	border-radius: 10px;
+	padding: 14px;
+}
+
+.help-page h2 {
+	margin: 0 0 10px;
+	font-size: 22px;
+}
+
+.help-page h3 {
+	margin: 8px 0 6px;
+	font-size: 17px;
+}
+
+.help-page p {
+	margin: 8px 0;
+	line-height: 1.6;
+}
+
+.help-page dl {
+	margin: 10px 0;
+}
+
+.help-page dt {
+	font-weight: 700;
+}
+
+.help-page dd {
+	margin: 2px 0 8px 14px;
+}
+
+.help-page ul {
+	margin: 8px 0 8px 20px;
+}
+
+.help-qa {
+	background: #f6f8fa;
+	border: 1px solid #d8dee4;
+	border-radius: 8px;
+	padding: 8px 10px;
+	margin: 8px 0;
+}
+
+.help-q,
+.help-a {
+	margin: 4px 0;
+}
+
+.help-link {
+	display: inline-block;
+	margin: 8px 0;
+	color: #0969da;
+	text-decoration: underline;
+}
+
+.help-image {
+	display: block;
+	margin: 10px 0;
+	max-width: 100%;
+	height: auto;
+	border: 1px solid #d0d7de;
+	border-radius: 6px;
+}

@@ -1,0 +1,52 @@
+*.cache
+
+*.swp
+*.*~
+project.lock.json
+.DS_Store
+*.pyc
+nupkg/
+
+# Visual Studio Code
+.vscode
+
+# Rider
+.idea
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+# Visual Studio 2015
+.vs/
+
+# -----------------------
+
+# 自動生成
+/*/@Assets/package.xml
+# 生成処理を使う場合は ModHelp が本体
+/*/@Assets/LangMod/
+/dev-items/debug-dll
+TestResult/
+*.lnk
+!/Directory.Build.props.user
+!/Directory.Build.targets.user
+

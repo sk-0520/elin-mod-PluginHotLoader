@@ -1,0 +1,163 @@
+name: Build
+
+on: push
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  json:
+    name: "<Validation> Json"
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Mod
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: latest
+
+      - name: Localization.json
+        run: |
+          set -e
+          npx ajv-cli@5 validate -s dev-items/Localization.schema.json -d Localization.json --all-errors
+
+      - name: Plugin.json
+        run: |
+          set -e
+          npx ajv-cli@5 validate -s dev-items/Plugin.schema.json -d Plugin.json --all-errors
+
+  xhtml:
+    name: "<Validation> XHTML"
+    # なんちゃって XML 検証
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Mod
+        uses: actions/checkout@v6
+
+      - name: Setup xmllint
+        if: ${{ hashFiles('Elin.Plugin.Main/@Assets/ModHelp/help.xhtml') != '' }}
+        run: sudo apt-get update && sudo apt-get install -y libxml2-utils
+
+      - name: help.xhtml
+        if: ${{ hashFiles('Elin.Plugin.Main/@Assets/ModHelp/help.xhtml') != '' }}
+        shell: bash
+        # 細かいのはあきらめー
+        run: |
+          xmllint Elin.Plugin.Main/@Assets/ModHelp/help.xhtml
+
+
+  build:
+    name: "<Build> Mod"
+
+    needs:
+      - json
+      - xhtml
+
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        configuration:
+          - Debug
+          - Release
+
+    steps:
+      - name: Checkout Mod
+        uses: actions/checkout@v6
+
+      - name: Checkout infrastructure
+        uses: actions/checkout@v6
+        with:
+            repository: sk-0520/elin-mod-ci-infrastructure
+            path: elin-mod-ci-infrastructure
+
+      - name: Setup CI Module
+        shell: pwsh
+        run: &setup-ci-module |
+          # .props
+          $propsPath = "Directory.Build.props.user"
+          $propsXml = [xml](Get-Content -Path $propsPath -Encoding UTF8)
+
+          if($propsXml.Project.PropertyGroup.AssemblyName -eq "********") {
+            $propsXml.Project.PropertyGroup.AssemblyName = "Elin.Mod.Dev.Sample"
+          }
+
+          $propsXml.Save($propsPath)
+
+          # .targets
+          $targetsPath = "Directory.Build.targets.user"
+          $targetsXml = [xml](Get-Content -Path $targetsPath -Encoding UTF8)
+
+          $propertyGroup = $targetsXml.CreateElement("PropertyGroup")
+          $steamPathGroup = $targetsXml.CreateElement("SteamPath")
+          $steamPathGroup.InnerText = "${{ github.workspace }}"
+          $elinPathGroup = $targetsXml.CreateElement("ElinPath")
+          $elinPathGroup.InnerText = '$(SteamPath)\elin-mod-ci-infrastructure\libs'
+          $modPathGroup = $targetsXml.CreateElement("ModPath")
+          $modPathGroup.InnerText = "${{ github.workspace }}\output"
+
+          $propertyGroup.AppendChild($steamPathGroup)
+          $propertyGroup.AppendChild($elinPathGroup)
+          $propertyGroup.AppendChild($modPathGroup)
+
+          $targetsXml.Project.AppendChild($propertyGroup)
+
+          $targetsXml.Save($targetsPath)
+
+          Get-Content -Path $propsPath -Encoding UTF8
+          Get-Content -Path $targetsPath -Encoding UTF8
+
+      - name: Build
+        shell: pwsh
+        run: |
+          dotnet build -c ${{ matrix.configuration }}
+
+      - name: Artifact
+        if: matrix.configuration == 'Release'
+        uses: actions/upload-artifact@v7
+        with:
+          name: artifact
+          path: output
+
+  test:
+    name: "<Test> Mod"
+
+    needs:
+      - json
+      - xhtml
+
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        configuration:
+          - Debug
+          - Release
+
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Checkout other repo
+        uses: actions/checkout@v6
+        with:
+            repository: sk-0520/elin-mod-ci-infrastructure
+            path: elin-mod-ci-infrastructure
+
+      - name: Setup CI Module
+        shell: pwsh
+        run: *setup-ci-module
+
+      - name: Test
+        shell: pwsh
+        run: |
+          dotnet test  -c ${{ matrix.configuration }}
+

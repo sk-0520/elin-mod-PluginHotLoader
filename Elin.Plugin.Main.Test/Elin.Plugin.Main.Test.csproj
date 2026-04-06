@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net481</TargetFramework>
+		<IsPackable>false</IsPackable>
+		<OutputType>Exe</OutputType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Elin.Plugin.Main\Elin.Plugin.Main.csproj" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\Elin.Plugin.Generator\Elin.Plugin.Generator.csproj">
+			<OutputItemType>Analyzer</OutputItemType>
+			<ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+		</ProjectReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<!--<AdditionalFiles Include="../Plugin.json" />-->
+		<AdditionalFiles Include="../Localization.json" />
+		<CompilerVisibleProperty Include="ElinPath" />
+		<CompilerVisibleProperty Include="AssemblyName" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Using Include="UnityEngine" />
+	</ItemGroup>
+
+</Project>

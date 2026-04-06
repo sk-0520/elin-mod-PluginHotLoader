@@ -1,0 +1,130 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Elin mod Plugin.json schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "package",
+    "mod"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "スキーマのURI"
+    },
+    "package": {
+      "type": "object",
+      "description": "package.xml 情報, https://docs.google.com/document/d/e/2PACX-1vQSITB8aYTycrnn3PxxGnPjNZ2_y1G3LDfXjC_PM5S_mTPCh6fv1vcj1bkfPbbUZ88WVb5_7T-62zYc/pub",
+      "required": [
+        "title",
+        "id",
+        "author",
+        "loadPriority",
+        "elinVersion",
+        "description",
+        "tags"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "このタグの中には、あなたのModのタイトルを記入してください。最初にWorkshopにModをアップロードする際に、ここで記述されたテキストがModのタイトルとして表示されます。Modを更新する際は、このテキストは無視されます。タイトルの変更が必要な場合は、Workshopから変更してください。"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_\\-\\.]+$",
+          "description": "ここでは、あなたのModを識別するためのユニークなIDを考えて記入してください。既に存在するModとIDが被っている場合は、Modはアップロードできません。IDは、容易に被らないような名前が好ましいです。 [Modテンプレート注釈] ファイル名として使用されることがあるため一部文字制限"
+        },
+        "author": {
+          "type": "string",
+          "description": "あなたの作者名を記述してください。何でも構いません。"
+        },
+        "loadPriority": {
+          "type": "integer",
+          "description": "Modがロードされる順番を指定します。0～任意の数字を記述してください。数字が低いModほど先に読み込まれます。",
+          "default": 100
+        },
+        "elinVersion": {
+          "type": "string",
+          "description": "あなたのModの動作が最後に確認できたElin本体のバージョンを記述してください。現在のところは、面倒なら頻繁にバージョンの記述は更新しなくてもかまいません。Elin本体にModに関わる大きな変更があった場合、その時の本体のバージョンより古いバージョンが記述されているModは読み込まれなくなります。",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "description": {
+          "type": "array",
+          "description": "あなたのModの説明文です。最初にWorkshopにModをアップロードする際に、ここで記述されたテキストがModの説明文として表示されます。Modを更新する際は、このテキストは無視されます。説明文の変更が必要な場合は、Workshopから変更してください。 [Modテンプレート注釈] 本来ならただの文字列だが、改行入れたりするの面倒なので1行を要素とした配列にした。",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "description": "Workshopに登録するタグをカンマ区切りで指定します（複数ある場合）。任意のタグを登録しても構いません。公式タグを設定すると、Workshopのカテゴリに表示されるようになります。詳しくはElin Workshop Tagをご覧ください。",
+          "items": {
+            "type": "string",
+            "enum": [
+              "BGM",
+              "Balance",
+              "Cheat",
+              "Class",
+              "Equipment",
+              "Flavor",
+              "General",
+              "Integration",
+              "Item Sprite",
+              "Item",
+              "Joke",
+              "Library",
+              "Map Sprite",
+              "NPC Sprite",
+              "NPC",
+              "PCC",
+              "Portrait",
+              "QoL",
+              "Quest",
+              "Race",
+              "Skill",
+              "Sprite",
+              "Translation",
+              "Utility"
+            ]
+          }
+        },
+        "visibility": {
+          "type": "string",
+          "description": "アップロードしたModの公開範囲を指定できます。 [Modテンプレート注釈] 通常は未入力でOK。",
+          "enum": [
+            "Public",
+            "Unlisted",
+            "Private",
+            "FriendsOnly"
+          ]
+        }
+      }
+    },
+    "mod": {
+      "type": "object",
+      "description": "Mod 固有情報",
+      "required": [
+        "version",
+        "useDebugId",
+        "log"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "Mod のバージョン (major.minor.patch)",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "useDebugId": {
+          "type": "boolean",
+          "description": "デバッグ時にIDを変更するかどうか。基本的に true で OK"
+        },
+        "log": {
+          "type": "string",
+          "description": "デバッグ時ログ出力パス"
+        }
+      }
+    }
+  }
+}

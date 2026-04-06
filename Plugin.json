@@ -1,0 +1,22 @@
+{
+  "$schema": "./dev-items/Plugin.schema.json",
+  "package": {
+    "title": "ユーザーに表示される Mod 名",
+    "id": "Please.Edit.Mod.Id",
+    "author": "作者",
+    "loadPriority": 100,
+    "elinVersion": "0.23.287",
+    "description": [
+      "説明1行目",
+      "説明2行目"
+    ],
+    "tags": [
+      "General"
+    ]
+  },
+  "mod": {
+    "version": "0.0.0",
+    "useDebugId": true,
+    "log": "NUL"
+  }
+}
