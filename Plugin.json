@@ -17,6 +17,6 @@
   "mod": {
     "version": "0.0.0",
     "useDebugId": true,
-    "log": "NUL"
+    "log": "x:\\PluginReloader.log"
   }
 }
