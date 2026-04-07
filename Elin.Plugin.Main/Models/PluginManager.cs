@@ -2,6 +2,7 @@ using BepInEx;
 using BepInEx.Logging;
 using Elin.Plugin.Main.PluginHelpers;
 using HarmonyLib;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,6 +16,7 @@ namespace Elin.Plugin.Main.Models
         const string OnDestroyMethodName = "OnDestroy";
         const string AwakeMethodName = "Awake";
         const string StartMethodName = "Start";
+        const string DebugMethodName = "PHL";
 
         #endregion
 
@@ -23,6 +25,22 @@ namespace Elin.Plugin.Main.Models
         #endregion
 
         #region function
+
+        private void CallMethodIfFound(Type type, BaseUnityPlugin plugin, string methodName)
+        {
+            ModHelper.WriteDev(methodName);
+            var method = AccessTools.Method(type, methodName);
+            if (method is not null)
+            {
+                ModHelper.LogNotify(LogLevel.Info, ModHelper.Lang.Formatter.FormatMethodStart(methodName: methodName));
+                method.Invoke(plugin, null);
+                ModHelper.LogNotify(LogLevel.Info, ModHelper.Lang.Formatter.FormatMethodEnd(methodName: methodName));
+            }
+            else
+            {
+                ModHelper.LogNotify(LogLevel.Debug, ModHelper.Lang.Formatter.FormatMethodNotFound(methodName: methodName));
+            }
+        }
 
         public void Unload(BaseUnityPlugin plugin)
         {
@@ -63,38 +81,16 @@ namespace Elin.Plugin.Main.Models
                 return null;
             }
 
-            var newPlugin = System.Activator.CreateInstance(newPluginType) as BaseUnityPlugin;
+            var newPlugin = Activator.CreateInstance(newPluginType) as BaseUnityPlugin;
             if (newPlugin is null)
             {
                 return null;
             }
             ModManager.ListPluginObject.Add(newPlugin);
 
-            ModHelper.WriteDev(AwakeMethodName);
-            var awake = AccessTools.Method(newPluginType, AwakeMethodName);
-            if (awake is not null)
-            {
-                ModHelper.LogNotify(LogLevel.Info, ModHelper.Lang.Formatter.FormatMethodStart(methodName: AwakeMethodName));
-                awake.Invoke(newPlugin, null);
-                ModHelper.LogNotify(LogLevel.Info, ModHelper.Lang.Formatter.FormatMethodEnd(methodName: AwakeMethodName));
-            }
-            else
-            {
-                ModHelper.LogNotify(LogLevel.Debug, ModHelper.Lang.Formatter.FormatMethodNotFound(methodName: AwakeMethodName));
-            }
-
-            ModHelper.WriteDev(StartMethodName);
-            var start = AccessTools.Method(newPluginType, StartMethodName);
-            if (start is not null)
-            {
-                ModHelper.LogNotify(LogLevel.Info, ModHelper.Lang.Formatter.FormatMethodStart(methodName: StartMethodName));
-                start.Invoke(newPlugin, null);
-                ModHelper.LogNotify(LogLevel.Info, ModHelper.Lang.Formatter.FormatMethodEnd(methodName: StartMethodName));
-            }
-            else
-            {
-                ModHelper.LogNotify(LogLevel.Debug, ModHelper.Lang.Formatter.FormatMethodNotFound(methodName: StartMethodName));
-            }
+            CallMethodIfFound(newPluginType, newPlugin, AwakeMethodName);
+            CallMethodIfFound(newPluginType, newPlugin, StartMethodName);
+            CallMethodIfFound(newPluginType, newPlugin, DebugMethodName);
 
             return newPlugin;
         }
