@@ -1,32 +1,105 @@
 {
   "$schema": "./dev-items/localization.schema.json",
   "general": {
-    "helloWorld": {
-      "JP": "こんにちは世界",
-      "EN": "Hello World",
-      "CN": "你好，世界"
+    "pluginIdNotSet": {
+      "JP": "プラグイン ID 未設定",
+      "EN": "Plugin ID not set",
+      "CN": "未设置插件 ID"
     },
-    "modSampleLabel": {
-      "JP": "[Mod例]",
-      "EN": "[Mod Sample]",
-      "CN": "[Mod示例]"
+    "stopIt": {
+      "JP": "やめろ",
+      "EN": "Stop it",
+      "CN": "別這樣"
+    },
+    "alreadyWaiting": {
+      "JP": "読み込み待機中",
+      "EN": "Already waiting for loading",
+      "CN": "已在等待加载"
+    },
+    "refreshPreStart": {
+      "JP": "更新開始",
+      "EN": "Refresh start",
+      "CN": "开始刷新"
+    },
+    "refreshEnd": {
+      "JP": "更新終了",
+      "EN": "Refresh end",
+      "CN": "刷新结束"
+    },
+    "failedRemove": {
+      "JP": "削除失敗",
+      "EN": "Failed to remove",
+      "CN": "删除失败"
     }
   },
   "format": {
-    "helloFormat": {
-      "JP": "${A} + ${B} = ${C}",
-      "EN": "${A} + ${B} = ${C}",
-      "CN": "${A} + ${B} = ${C}",
+    "pluginFound": {
+      "JP": "プラグイン発見: ${PLUGIN_ID}",
+      "EN": "Plugin found: ${PLUGIN_ID}",
+      "CN": "发现插件: ${PLUGIN_ID}",
       "parameters": {
-        "A": {
+        "PLUGIN_ID": {
+          "type": "string"
+        }
+      }
+    },
+    "pluginNotFound": {
+      "JP": "プラグイン未発見: ${PLUGIN_ID}",
+      "EN": "Plugin not found: ${PLUGIN_ID}",
+      "CN": "未发现插件: ${PLUGIN_ID}",
+      "parameters": {
+        "PLUGIN_ID": {
+          "type": "string"
+        }
+      }
+    },
+    "skipRefresh": {
+      "JP": "ハッシュ値が同じため更新をスキップ(${HASH})",
+      "EN": "Refresh skipped due to identical hash (${HASH})",
+      "CN": "由于哈希值相同，刷新被跳过 (${HASH})",
+      "parameters": {
+        "HASH": {
+          "type": "string"
+        }
+      }
+    },
+    "refreshStart": {
+      "JP": "更新開始(${COUNT})",
+      "EN": "Refresh start(${COUNT})",
+      "CN": "开始刷新(${COUNT})",
+      "parameters": {
+        "COUNT": {
           "type": "int"
-        },
-        "B": {
-          "type": "int"
-        },
-        "C": {
-          "type": "int",
-          "format": "N0"
+        }
+      }
+    },
+    "methodStart": {
+      "JP": "メソッド開始: ${METHOD_NAME}",
+      "EN": "Method start: ${METHOD_NAME}",
+      "CN": "方法开始: ${METHOD_NAME}",
+      "parameters": {
+        "METHOD_NAME": {
+          "type": "string"
+        }
+      }
+    },
+    "methodEnd": {
+      "JP": "メソッド終了: ${METHOD_NAME}",
+      "EN": "Method end: ${METHOD_NAME}",
+      "CN": "方法结束: ${METHOD_NAME}",
+      "parameters": {
+        "METHOD_NAME": {
+          "type": "string"
+        }
+      }
+    },
+    "methodNotFound": {
+      "JP": "メソッドなし: ${METHOD_NAME}",
+      "EN": "Method not found: ${METHOD_NAME}",
+      "CN": "未发现方法: ${METHOD_NAME}",
+      "parameters": {
+        "METHOD_NAME": {
+          "type": "string"
         }
       }
     }

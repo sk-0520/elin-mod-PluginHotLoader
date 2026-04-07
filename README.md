@@ -1,25 +1,20 @@
-# elin-mod-dev-setup
+# elin-mod-PluginHotLoader
 
-## はじめに
+Mod 開発時にプラグインの再読み込みをサポートするための Mod です。
 
-本リポジトリは [Elin](https://store.steampowered.com/app/2135150/Elin) の Mod を作成するためのテンプレートとなります。
+色々挙動が怪しいので、ローカルで Mod 開発する際に使用してください。
 
-[soeklgb/elin-mod-dev-setup](https://github.com/soeklgb/elin-mod-dev-setup) で公開されていたサンプルをもとに Mod を作成し、その成果物を整理してテンプレートという形で再構築しました。  
-そういった大元を作成していただいた soeklgb 氏に感謝します。
+## 使い方
 
-このテンプレートでは Mod 開発環境を整えることに焦点を当てているため、実際の作り方は説明しませんので Elin の Mod 作成における関連文書は以下を参考にしてください。
+設定ファイル: `Elin\BepInEx\config\sk.pluginhotloader(.debug).cfg`
 
- * https://ylvapedia.wiki/wiki/Elin:Mod
- * https://elin-modding-resources.github.io/Elin.Docs/
+* 本 Mod を Elin に導入すると設定ファイルが作成されます
+* 設定項目 `PluginId` に再読み込み対象のプラグインIDを設定してください
+* Elin を再起動すると、指定したプラグインを監視して、変更があった場合に再読み込みするようになります
 
-## 始め方
+## 注意点
 
-別ページにまとめていますのでリンク先を参照してください。
-
-* [テンプレートを用いた Mod 開発](docs/ja/README.md)
-
-## 細かい話
-
-* Visual Studio が好きなので VSCode は扱いません
-* 書いている人間も Mod 初心者なので、実装が変かもしれません
+* 再読み込みはその場のノリと勢いだけで処理されているので、Unity、BepInEx、Elin による正式な読み込みを経由しません
+* 多分 Windows でしか動作しません
+* **リリース前には再読み込みではなく、Elin を通常起動して、正規の手順で読み込ませて動作確認してください**
 

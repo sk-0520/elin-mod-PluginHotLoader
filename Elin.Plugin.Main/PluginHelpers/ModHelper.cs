@@ -1,4 +1,4 @@
-﻿using BepInEx;
+using BepInEx;
 using BepInEx.Logging;
 using Elin.Plugin.Generated;
 using System;
@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 
 namespace Elin.Plugin.Main.PluginHelpers
 {
@@ -34,11 +35,12 @@ namespace Elin.Plugin.Main.PluginHelpers
         /// <summary>
         /// プラグイン。
         /// </summary>
-        public static BaseUnityPlugin Plugin { get; set; } = default!;
+        public static BaseUnityPlugin Plugin { get; private set; } = default!;
         /// <summary>
         /// <see cref="BepInEx"/>の提供するロガー。
         /// </summary>
-        public static ManualLogSource Logger { get; set; } = default!;
+        public static ManualLogSource Logger { get; private set; } = default!;
+        public static SynchronizationContext Context { get; private set; } = default!;
 
 #if DEBUG
         private static FileLogger FileLogger { get; set; } = default!;
@@ -55,6 +57,16 @@ namespace Elin.Plugin.Main.PluginHelpers
         /// </summary>
         internal static ElinHelper Elin { get; } = new ElinHelper();
 
+        /// <summary>
+        /// メッセージ出力可能なシーンか。
+        /// </summary>
+        public static bool CanOutputMessage => Scene.scene.mode switch
+        {
+            Scene.Mode.Zone => true,
+            Scene.Mode.StartGame => true,
+            _ => false,
+        };
+
         #endregion
 
         #region function
@@ -65,6 +77,7 @@ namespace Elin.Plugin.Main.PluginHelpers
         /// <remarks><see cref="BaseUnityPlugin"/>の開始時に設定する想定。</remarks>
         /// <param name="plugin"></param>
         /// <param name="logger"></param>
+        /// <param name="context"></param>
         /// <example>
         /// <code>
         /// class Plugin : BaseUnityPlugin
@@ -76,10 +89,11 @@ namespace Elin.Plugin.Main.PluginHelpers
         /// }
         /// </code>
         /// </example>
-        public static void Initialize(BaseUnityPlugin plugin, ManualLogSource logger)
+        public static void Initialize(BaseUnityPlugin plugin, ManualLogSource logger, SynchronizationContext context)
         {
             Plugin = plugin;
             Logger = logger;
+            Context = context;
 
 #if DEBUG
             FileLogger = new FileLogger(Mod.LogFile);
@@ -158,11 +172,11 @@ namespace Elin.Plugin.Main.PluginHelpers
         }
 
         /// <summary>
-        /// デバッグ時専用処理。
+        /// 開発時専用処理。
         /// </summary>
         /// <param name="action"></param>
         [Conditional("DEBUG")]
-        public static void DoDebug(Action action)
+        public static void DoDev(Action action)
         {
             if (!IsDebug)
             {
@@ -172,8 +186,20 @@ namespace Elin.Plugin.Main.PluginHelpers
             action();
         }
 
+        private static void DoMessage(Action action)
+        {
+            if (!CanOutputMessage)
+            {
+                return;
+            }
+            Context.Post(static a =>
+            {
+                ((Action)a)();
+            }, action);
+        }
+
         /// <summary>
-        /// デバッグログ出力。
+        /// 開発ログ出力。
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="s">出力ログ。</param>
@@ -184,7 +210,7 @@ namespace Elin.Plugin.Main.PluginHelpers
         /// <param name="callerFilePath"></param>
         /// <param name="callerLineNumber"></param>
         [Conditional("DEBUG")]
-        private static void LogDebugCore<T>(T s, Color color, bool outputMessage, bool outputLogFile, string callerMemberName, string callerFilePath, int callerLineNumber)
+        private static void LogDevCore<T>(T s, Color color, bool outputMessage, bool outputLogFile, string callerMemberName, string callerFilePath, int callerLineNumber)
         {
             if (!IsDebug)
             {
@@ -219,28 +245,31 @@ namespace Elin.Plugin.Main.PluginHelpers
             if (outputMessage)
             {
                 var lines = text.SplitNewline();
-                var originalColor = Msg.currentColor;
-                try
+                DoMessage(() =>
                 {
-                    Msg.NewLine();
-                    Msg.SetColor(Color.green);
-                    Msg.SayRaw($"[{Mod.Name}] ");
-                    Msg.SetColor(color);
-                    foreach (var line in lines)
+                    var originalColor = Msg.currentColor;
+                    try
                     {
-                        Msg.SayRaw(line);
                         Msg.NewLine();
+                        Msg.SetColor(Color.cyan);
+                        Msg.SayRaw($"<{Package.Title}> ");
+                        Msg.SetColor(color);
+                        foreach (var line in lines)
+                        {
+                            Msg.SayRaw(line);
+                            Msg.NewLine();
+                        }
                     }
-                }
-                finally
-                {
-                    Msg.SetColor(originalColor);
-                }
+                    finally
+                    {
+                        Msg.SetColor(originalColor);
+                    }
+                });
             }
         }
 
         /// <summary>
-        /// デバッグメッセージ出力。
+        /// 開発メッセージ出力。
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="s">出力メッセージ。</param>
@@ -249,20 +278,20 @@ namespace Elin.Plugin.Main.PluginHelpers
         /// <param name="callerFilePath"></param>
         /// <param name="callerLineNumber"></param>
         [Conditional("DEBUG")]
-        public static void MessageDebug<T>(T s, Color color, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
+        public static void MessageDev<T>(T s, Color color, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            LogDebugCore(s, color, true, false, callerMemberName, callerFilePath, callerLineNumber);
+            LogDevCore(s, color, true, false, callerMemberName, callerFilePath, callerLineNumber);
         }
 
-        /// <inheritdoc cref="MessageDebug{T}(T, Color, string, string, int)"/>
+        /// <inheritdoc cref="MessageDev{T}(T, Color, string, string, int)"/>
         [Conditional("DEBUG")]
-        public static void MessageDebug<T>(T s, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
+        public static void MessageDev<T>(T s, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            LogDebugCore(s, Msg.currentColor, true, false, callerMemberName, callerFilePath, callerLineNumber);
+            LogDevCore(s, Msg.currentColor, true, false, callerMemberName, callerFilePath, callerLineNumber);
         }
 
         /// <summary>
-        /// デバッグファイルログ出力。
+        /// 開発ファイルログ出力。
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="s">出力ログ。</param>
@@ -270,13 +299,13 @@ namespace Elin.Plugin.Main.PluginHelpers
         /// <param name="callerFilePath"></param>
         /// <param name="callerLineNumber"></param>
         [Conditional("DEBUG")]
-        public static void WriteDebug<T>(T s, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
+        public static void WriteDev<T>(T s, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            LogDebugCore(s, Msg.currentColor, false, true, callerMemberName, callerFilePath, callerLineNumber);
+            LogDevCore(s, Msg.currentColor, false, true, callerMemberName, callerFilePath, callerLineNumber);
         }
 
         /// <summary>
-        /// デバッグログメッセージとデバッグログ出力。
+        /// 開発ログメッセージと開発ログ出力。
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="s">出力ログ。</param>
@@ -285,16 +314,16 @@ namespace Elin.Plugin.Main.PluginHelpers
         /// <param name="callerFilePath"></param>
         /// <param name="callerLineNumber"></param>
         [Conditional("DEBUG")]
-        public static void LogDebug<T>(T s, Color color, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
+        public static void LogDev<T>(T s, Color color, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            LogDebugCore(s, color, true, true, callerMemberName, callerFilePath, callerLineNumber);
+            LogDevCore(s, color, true, true, callerMemberName, callerFilePath, callerLineNumber);
         }
 
-        /// <inheritdoc cref="LogDebug{T}(T, Color, string, string, int)"/>
+        /// <inheritdoc cref="LogDev{T}(T, Color, string, string, int)"/>
         [Conditional("DEBUG")]
-        public static void LogDebug<T>(T s, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
+        public static void LogDev<T>(T s, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            LogDebugCore(s, Msg.currentColor, true, true, callerMemberName, callerFilePath, callerLineNumber);
+            LogDevCore(s, Msg.currentColor, true, true, callerMemberName, callerFilePath, callerLineNumber);
         }
 
         /// <summary>
@@ -320,23 +349,26 @@ namespace Elin.Plugin.Main.PluginHelpers
 #endif
             Logger.LogError($"{header}: {string.Join(Environment.NewLine, lines)}");
 
-            var originalColor = Msg.currentColor;
-            try
+            DoMessage(() =>
             {
-                Msg.NewLine();
-                Msg.SetColor(Color.yellow);
-                Msg.SayRaw($"-------- {Package.Title}:NotExpected --------");
-                Msg.SayRaw($"[{callerMemberName}] {Path.GetFileName(callerFilePath)}:{callerLineNumber}");
-                foreach (var line in lines)
+                var originalColor = Msg.currentColor;
+                try
                 {
-                    Msg.SayRaw(line);
                     Msg.NewLine();
+                    Msg.SetColor(Color.yellow);
+                    Msg.SayRaw($"-------- {Package.Title}:NotExpected --------");
+                    Msg.SayRaw($"[{callerMemberName}] {Path.GetFileName(callerFilePath)}:{callerLineNumber}");
+                    foreach (var line in lines)
+                    {
+                        Msg.SayRaw(line);
+                        Msg.NewLine();
+                    }
                 }
-            }
-            finally
-            {
-                Msg.currentColor = originalColor;
-            }
+                finally
+                {
+                    Msg.currentColor = originalColor;
+                }
+            });
         }
 
         /// <inheritdoc cref="LogNotExpected(IEnumerable{string}, string, string, int)"/>
@@ -380,32 +412,35 @@ namespace Elin.Plugin.Main.PluginHelpers
 #endif
             if (outputMessage)
             {
-                var originalColor = Msg.currentColor;
-                try
+                DoMessage(() =>
                 {
-                    var color = logLevel switch
+                    var originalColor = Msg.currentColor;
+                    try
                     {
-                        LogLevel.Debug => Color.gray,
-                        LogLevel.Info => Color.blue,
-                        LogLevel.Message => Color.white,
-                        LogLevel.Warning => Color.yellow,
-                        LogLevel.Error => Color.red,
-                        LogLevel.Fatal => new Color(0.5f, 0, 0),
-                        _ => Color.green,
-                    };
+                        var color = logLevel switch
+                        {
+                            LogLevel.Debug => Color.gray,
+                            LogLevel.Info => Color.blue,
+                            LogLevel.Message => Color.white,
+                            LogLevel.Warning => Color.yellow,
+                            LogLevel.Error => Color.red,
+                            LogLevel.Fatal => new Color(0.5f, 0, 0),
+                            _ => Color.green,
+                        };
 
-                    Msg.SetColor(Color.cyan);
-                    Msg.SayRaw($"<{Package.Title}> ");
+                        Msg.SetColor(Color.cyan);
+                        Msg.SayRaw($"<{Package.Title}> ");
 
-                    Msg.SetColor(color);
-                    Msg.SayRaw(message);
+                        Msg.SetColor(color);
+                        Msg.SayRaw(message);
 
-                    Msg.NewLine();
-                }
-                finally
-                {
-                    Msg.SetColor(originalColor);
-                }
+                        Msg.NewLine();
+                    }
+                    finally
+                    {
+                        Msg.SetColor(originalColor);
+                    }
+                });
             }
         }
 

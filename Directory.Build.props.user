@@ -5,7 +5,7 @@
 		Mod のプログラム名を指定
 		Mod フォルダ名と DLL 名に使用されます
 		-->
-		<AssemblyName>PluginReloader</AssemblyName>
+		<AssemblyName>PluginHotLoader</AssemblyName>
 	</PropertyGroup>
 
 	<!-- 以下自由に設定してください -->

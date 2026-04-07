@@ -2,6 +2,7 @@ using BepInEx;
 using Elin.Plugin.Generated;
 using Elin.Plugin.Main.PluginHelpers;
 using HarmonyLib;
+using System.Threading;
 
 namespace Elin.Plugin.Main
 {
@@ -16,7 +17,7 @@ namespace Elin.Plugin.Main
         /// <remarks>本メソッドではインフラ面の構築も行っているため、プラグインとしての起動処理は <see cref="AwakePlugin(Harmony)"/> で実施する。</remarks>
         public void Awake()
         {
-            ModHelper.Initialize(this, Logger);
+            ModHelper.Initialize(this, Logger, SynchronizationContext.Current);
 
             var harmony = new Harmony(Package.Id);
 
