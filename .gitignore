@@ -42,6 +42,7 @@ msbuild.wrn
 
 # 自動生成
 /*/@Assets/package.xml
+/*/@Assets/preview.jpg
 # 生成処理を使う場合は ModHelp が本体
 /*/@Assets/LangMod/
 /dev-items/debug-dll
