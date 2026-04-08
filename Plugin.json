@@ -7,7 +7,14 @@
     "loadPriority": 100,
     "elinVersion": "0.23.287",
     "description": [
+      "[JP] Mod 開発時のプラグインの再読み込みをある程度簡単にする Mod です。",
+      "[EN] A mod that makes it easier to reload plugins during mod development.",
+      "[CN] 一个在 mod 开发过程中更容易重新加载插件的 mod",
+      "",
+      "[SETTING]",
       "Elin\\BepInEx\\config\\sk.pluginhotloader(.debug).cfg",
+      "",
+      "---",
       "https://github.com/sk-0520/elin-mod-PluginHotLoader"
     ],
     "tags": [
