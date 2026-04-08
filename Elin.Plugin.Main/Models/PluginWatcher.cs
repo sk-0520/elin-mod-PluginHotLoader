@@ -13,7 +13,7 @@ namespace Elin.Plugin.Main.Models
 
         private int ReloadCount { get; set; }
 
-        private System.TimeSpan DelayTime { get; } = System.TimeSpan.FromSeconds(3);
+        private System.TimeSpan DelayTime { get; } = System.TimeSpan.FromSeconds(5);
         private bool Waiting { get; set; }
         private string Hash { get; set; } = string.Empty;
 
