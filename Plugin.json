@@ -17,6 +17,6 @@
   "mod": {
     "version": "0.0.0",
     "useDebugId": true,
-    "log": "x:\\elin-mod-PluginHotLoader.log"
+    "log": "NUL"
   }
 }

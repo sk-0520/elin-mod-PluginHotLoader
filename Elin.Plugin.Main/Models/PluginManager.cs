@@ -51,18 +51,7 @@ namespace Elin.Plugin.Main.Models
             // 破棄
             //ModHelper.WriteDebug("Object.DestroyImmediate");
             //Object.DestroyImmediate(plugin);
-
-            var onDestroyMethod = AccessTools.Method(plugin.GetType(), OnDestroyMethodName);
-            if (onDestroyMethod is not null)
-            {
-                ModHelper.LogNotify(LogLevel.Info, ModHelper.Lang.Formatter.FormatMethodStart(methodName: OnDestroyMethodName));
-                onDestroyMethod.Invoke(plugin, null);
-                ModHelper.LogNotify(LogLevel.Info, ModHelper.Lang.Formatter.FormatMethodEnd(methodName: OnDestroyMethodName));
-            }
-            else
-            {
-                ModHelper.LogNotify(LogLevel.Debug, ModHelper.Lang.Formatter.FormatMethodNotFound(methodName: OnDestroyMethodName));
-            }
+            CallMethodIfFound(plugin.GetType(), plugin, OnDestroyMethodName);
 
             ModHelper.WriteDev("Remove");
             if (!ModManager.ListPluginObject.Remove(plugin))
