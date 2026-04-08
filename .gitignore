@@ -47,6 +47,5 @@ msbuild.wrn
 /dev-items/debug-dll
 TestResult/
 *.lnk
-!/Directory.Build.props.user
-!/Directory.Build.targets.user
+Plugin.dev.json
 

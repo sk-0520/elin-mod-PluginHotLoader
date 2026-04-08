@@ -2,13 +2,13 @@ using System;
 
 namespace Elin.Plugin.Generator
 {
-    public record class PluginMacro
+    internal record class PluginMacro
     {
         public string ElinModulePath { get; set; } = string.Empty;
         public string AssemblyName { get; set; } = string.Empty;
     }
 
-    internal class PluginPackage
+    internal record class PluginPackage
     {
         #region property
 
@@ -24,7 +24,7 @@ namespace Elin.Plugin.Generator
         #endregion
     }
 
-    internal class PluginMod
+    internal record class PluginMod
     {
         #region property
 
@@ -35,12 +35,21 @@ namespace Elin.Plugin.Generator
         #endregion
     }
 
-    internal class PluginDefine
+    internal record class PluginDefine
     {
         #region property
 
         public PluginPackage Package { get; set; } = new PluginPackage();
         public PluginMod Mod { get; set; } = new PluginMod();
+
+        #endregion
+    }
+
+    internal record class PluginDevDefine
+    {
+        #region property
+
+        public string? Log { get; set; }
 
         #endregion
     }

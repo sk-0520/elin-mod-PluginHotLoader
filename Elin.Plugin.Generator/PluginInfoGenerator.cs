@@ -2,28 +2,54 @@ using Microsoft.CodeAnalysis;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 
 namespace Elin.Plugin.Generator
 {
     [Generator(LanguageNames.CSharp)]
     public class PluginInfoGenerator : IIncrementalGenerator
     {
+        #region property
+
+        private JsonSerializerOptions JsonSerializerOptions = new System.Text.Json.JsonSerializerOptions()
+        {
+            PropertyNameCaseInsensitive = true,
+            AllowTrailingCommas = true,
+            ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip,
+        };
+
+        #endregion
         #region IIncrementalGenerator
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             var define = context.AdditionalTextsProvider
                 .Where(file => Path.GetFileName(file.Path) == GeneratorConstants.PluginInfoFileName)
-                .Select((file, _) => file.GetText()?.ToString())
-                .Where(a => a != null)
-                .Select((text, _) =>
+                .Select((file, _) => (file: file, json: file.GetText()?.ToString()))
+                .Where(a => a.json != null)
+                .Select((a, _) =>
                 {
-                    return System.Text.Json.JsonSerializer.Deserialize<PluginDefine>(text!, new System.Text.Json.JsonSerializerOptions()
+                    var define = JsonSerializer.Deserialize<PluginDefine>(a.json!, JsonSerializerOptions);
+
+                    if (define is not null)
                     {
-                        PropertyNameCaseInsensitive = true,
-                        AllowTrailingCommas = true,
-                        ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip,
-                    });
+                        var devPath = Path.Combine(Path.GetDirectoryName(a.file.Path), GeneratorConstants.PluginInfoDevFileName);
+                        if (File.Exists(devPath))
+                        {
+                            var devJson = File.ReadAllText(devPath);
+                            var devDefine = JsonSerializer.Deserialize<PluginDevDefine>(devJson, JsonSerializerOptions);
+                            if (devDefine is not null)
+                            {
+                                // たとえ空文字列でも未設定でないのであれば上書きする
+                                if (devDefine.Log is not null)
+                                {
+                                    define.Mod.Log = devDefine.Log;
+                                }
+                            }
+                        }
+                    }
+
+                    return define;
                 })
             ;
 
