@@ -1,5 +1,6 @@
 using BepInEx;
 using BepInEx.Logging;
+using Elin.Plugin.Main.Models.Settings;
 using Elin.Plugin.Main.PluginHelpers;
 using System.IO;
 using System.Security.Cryptography;
@@ -8,14 +9,24 @@ namespace Elin.Plugin.Main.Models
 {
     public class PluginWatcher
     {
+        public PluginWatcher(IWatchSetting watchSetting)
+        {
+            WatchSetting = watchSetting;
+        }
+
         #region property
+        private IWatchSetting WatchSetting { get; }
+
         private HashAlgorithm HashAlgorithm { get; } = MD5.Create();
+
+        private readonly object _sync = new object();
 
         private int ReloadCount { get; set; }
 
-        private System.TimeSpan DelayTime { get; } = System.TimeSpan.FromSeconds(5);
         private bool Waiting { get; set; }
+
         private string Hash { get; set; } = string.Empty;
+
 
         #endregion
 
@@ -49,25 +60,36 @@ namespace Elin.Plugin.Main.Models
 
         private void DelayRefreshPlugin(BaseUnityPlugin oldPlugin, string newPluginPath)
         {
-            if (Waiting)
+            lock (this._sync)
             {
-                ModHelper.LogNotify(LogLevel.Info, ModHelper.Lang.General.AlreadyWaiting);
-                return;
-            }
-
-            Waiting = true;
-            Timer.Start((float)DelayTime.TotalSeconds, () =>
-            {
-                ModHelper.LogNotify(LogLevel.Info, ModHelper.Lang.General.RefreshPreStart);
-                var hash = ComputeHash(newPluginPath);
-                if (hash == Hash)
+                if (Waiting)
                 {
-                    ModHelper.LogNotify(LogLevel.Info, ModHelper.Lang.Formatter.FormatSkipRefresh(hash: hash));
-                    Waiting = false;
+                    ModHelper.LogNotify(LogLevel.Info, ModHelper.Lang.General.AlreadyWaiting);
                     return;
                 }
-                Hash = hash;
-                RefreshPlugin(oldPlugin, newPluginPath);
+
+                Waiting = true;
+            }
+
+            Timer.Start((float)WatchSetting.DelayTime.TotalSeconds, () =>
+            {
+                try
+                {
+                    ModHelper.LogNotify(LogLevel.Info, ModHelper.Lang.General.RefreshPreStart);
+                    var hash = ComputeHash(newPluginPath);
+                    if (hash == Hash)
+                    {
+                        ModHelper.LogNotify(LogLevel.Info, ModHelper.Lang.Formatter.FormatSkipRefresh(hash: hash));
+                        return;
+                    }
+                    Hash = hash;
+                    RefreshPlugin(oldPlugin, newPluginPath);
+                }
+                finally
+                {
+                    Waiting = false;
+                }
+
             }, false);
         }
 
@@ -90,10 +112,6 @@ namespace Elin.Plugin.Main.Models
             catch (System.Exception ex)
             {
                 ModHelper.LogNotExpected(ex);
-            }
-            finally
-            {
-                Waiting = false;
             }
         }
 

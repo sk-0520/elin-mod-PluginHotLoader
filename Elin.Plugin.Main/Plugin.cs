@@ -51,6 +51,12 @@ namespace Elin.Plugin.Main
             Debug.Assert(Harmony is not null);
 
             var setting = Setting.Instance;
+            if (!setting.IsEnabled)
+            {
+                // 無効なら無言でばいばい
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(setting.PluginId))
             {
                 ModHelper.WriteDev(ModHelper.Lang.General.PluginIdNotSet);
@@ -66,7 +72,7 @@ namespace Elin.Plugin.Main
             if (plugin is not null)
             {
                 ModHelper.WriteDev(ModHelper.Lang.Formatter.FormatPluginFound(pluginId: setting.PluginId));
-                PluginWatcher = new PluginWatcher();
+                PluginWatcher = new PluginWatcher(setting);
                 PluginWatcher.Register(plugin);
             }
             else
