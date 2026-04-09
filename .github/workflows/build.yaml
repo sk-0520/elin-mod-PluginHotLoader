@@ -1,6 +1,8 @@
 name: Build
 
-on: push
+on:
+  push:
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -52,19 +54,18 @@ jobs:
         run: |
           xmllint Elin.Plugin.Main/@Assets/ModHelp/help.xhtml
 
-
   build:
     name: "<Build> Mod"
 
-    needs:
+    needs: &dependence-jobs
       - json
       - xhtml
 
-    runs-on: windows-latest
+    runs-on: &mod-os-image windows-latest
 
     strategy:
       matrix:
-        configuration:
+        configuration: &matrix-configurations
           - Debug
           - Release
 
@@ -72,9 +73,9 @@ jobs:
       - name: Checkout Mod
         uses: actions/checkout@v6
 
-      - name: Checkout infrastructure
+      - name: Checkout CI Module
         uses: actions/checkout@v6
-        with:
+        with: &checkout-ci-module
             repository: sk-0520/elin-mod-ci-infrastructure
             path: elin-mod-ci-infrastructure
 
@@ -117,7 +118,7 @@ jobs:
       - name: Build
         shell: pwsh
         run: |
-          dotnet build -c ${{ matrix.configuration }}
+          dotnet build --configuration ${{ matrix.configuration }}
 
       - name: Artifact
         if: matrix.configuration == 'Release'
@@ -129,28 +130,21 @@ jobs:
   test:
     name: "<Test> Mod"
 
-    needs:
-      - json
-      - xhtml
+    needs: *dependence-jobs
 
-    runs-on: windows-latest
+    runs-on: *mod-os-image
 
     strategy:
       matrix:
-        configuration:
-          - Debug
-          - Release
-
+        configuration: *matrix-configurations
 
     steps:
-      - name: Checkout
+      - name: Checkout Mod
         uses: actions/checkout@v6
 
-      - name: Checkout other repo
+      - name: Checkout CI Module
         uses: actions/checkout@v6
-        with:
-            repository: sk-0520/elin-mod-ci-infrastructure
-            path: elin-mod-ci-infrastructure
+        with: *checkout-ci-module
 
       - name: Setup CI Module
         shell: pwsh
@@ -159,5 +153,5 @@ jobs:
       - name: Test
         shell: pwsh
         run: |
-          dotnet test  -c ${{ matrix.configuration }}
+          dotnet test --configuration ${{ matrix.configuration }}
 

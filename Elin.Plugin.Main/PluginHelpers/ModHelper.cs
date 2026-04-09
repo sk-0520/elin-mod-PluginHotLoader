@@ -192,6 +192,8 @@ namespace Elin.Plugin.Main.PluginHelpers
             {
                 return;
             }
+
+            // TODO: とりあえず全部 Post に投げ込んでいるが、同期スレッドで実行している場合の分岐とかあった方がいい, 一旦今はこれでいい
             Context.Post(static a =>
             {
                 ((Action)a)();
