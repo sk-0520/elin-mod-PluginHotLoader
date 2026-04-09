@@ -33,7 +33,6 @@
 
 	<Target Name="RemoveFiles" BeforeTargets="BeforeBuild">
 		<RemoveDir Directories="$(TargetDir)" />
-		<RemoveDir Directories="$(ModPath)" />
 	</Target>
 
 	<Target Name="ConvertPreviewImage" AfterTargets="AfterBuild" Condition="Exists('$(ProjectDir)@Assets\preview.png')">
@@ -52,6 +51,8 @@
 	</Target>
 
 	<Target Name="CopyFiles" AfterTargets="AfterBuild" DependsOnTargets="ConvertPreviewImage;BuildModHelp">
+		<RemoveDir Directories="$(ModPath)" />
+		
 		<MakeDir Directories="$(ModPath)" />
 
 		<ItemGroup>
