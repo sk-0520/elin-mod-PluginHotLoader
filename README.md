@@ -1,4 +1,4 @@
-# elin-mod-PluginHotLoader
+# PluginHotLoader
 
 Mod 開発時にプラグインの再読み込みをサポートするための Mod です。
 
