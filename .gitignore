@@ -47,6 +47,7 @@ msbuild.wrn
 /*/@Assets/LangMod/
 /dev-items/debug-dll
 TestResult/
+TestResults/
 *.lnk
 Plugin.dev.json
 
