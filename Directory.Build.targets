@@ -1,16 +1,5 @@
 <Project>
-	<!-- 独自項目追加は Directory.Build.targets.user を使用してください -->
-	
-	<PropertyGroup>
-		<!-- props 時点ではアセンブリ名がない -->
-		<DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
-	</PropertyGroup>
-
-	<PropertyGroup>
-		<SteamPath>C:\Program Files (x86)\Steam</SteamPath>
-		<ElinPath>$(SteamPath)\steamapps\common\Elin</ElinPath>
-		<ModPath>$(ElinPath)\Package\$(AssemblyName)</ModPath>
-	</PropertyGroup>
-	
-	<Import Project="Directory.Build.targets.user" Condition="Exists('Directory.Build.targets.user')" />
+	<!-- テンプレート側設定項目 -->
+	<Import Project="Directory.Build.targets.mod-template" />
+	<!-- 以下 Mod 開発者側設定項目 -->
 </Project>

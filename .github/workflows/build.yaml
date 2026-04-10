@@ -54,12 +54,29 @@ jobs:
         run: |
           xmllint Elin.Plugin.Main/@Assets/ModHelp/help.xhtml
 
+  markdown:
+    name: "<Validation> Markdown"
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Mod
+        uses: actions/checkout@v6
+
+      - name: "*.md"
+        if: ${{ hashFiles('**/*.md') != '' }}
+        uses: DavidAnson/markdownlint-cli2-action@v23
+        with:
+          globs: '**/*.md'
+          config: .markdownlint.json
+
   build:
     name: "<Build> Mod"
 
     needs: &dependence-jobs
       - json
       - xhtml
+      - markdown
 
     runs-on: &mod-os-image windows-latest
 
@@ -82,18 +99,18 @@ jobs:
       - name: Setup CI Module
         shell: pwsh
         run: &setup-ci-module |
-          # .props
-          $propsPath = "Directory.Build.props.user"
-          $propsXml = [xml](Get-Content -Path $propsPath -Encoding UTF8)
+          # .Assembly.xml
+          $asmPath = "Elin.Plugin.Main.Assembly.xml"
+          $asmXml = [xml](Get-Content -Path $asmPath -Encoding UTF8)
 
-          if($propsXml.Project.PropertyGroup.AssemblyName -eq "********") {
-            $propsXml.Project.PropertyGroup.AssemblyName = "Elin.Mod.Dev.Sample"
+          if($asmXml.Project.PropertyGroup.AssemblyName -eq "********") {
+            $asmXml.Project.PropertyGroup.AssemblyName = "Elin.Mod.Dev.Sample"
           }
 
-          $propsXml.Save($propsPath)
+          $asmXml.Save($asmPath)
 
           # .targets
-          $targetsPath = "Directory.Build.targets.user"
+          $targetsPath = "Directory.Build.targets"
           $targetsXml = [xml](Get-Content -Path $targetsPath -Encoding UTF8)
 
           $propertyGroup = $targetsXml.CreateElement("PropertyGroup")
@@ -112,7 +129,7 @@ jobs:
 
           $targetsXml.Save($targetsPath)
 
-          Get-Content -Path $propsPath -Encoding UTF8
+          Get-Content -Path $asmPath -Encoding UTF8
           Get-Content -Path $targetsPath -Encoding UTF8
 
       - name: Build

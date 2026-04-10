@@ -1,0 +1,89 @@
+<Project>
+
+	<PropertyGroup>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<WarningLevel>9999</WarningLevel>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<Nullable>enable</Nullable>
+
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+		<InvariantGlobalization>true</InvariantGlobalization>
+		<PredefinedCulturesOnly>false</PredefinedCulturesOnly>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<AnalysisMode>All</AnalysisMode>
+
+		<LangVersion>latest</LangVersion>
+		<!-- ISymbol.GetDocumentationCommentXml を使用するためだけのドキュメント生成 -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+		<DefineConstants>TRACE;DEBUG</DefineConstants>
+		<DebugType>full</DebugType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Release' ">
+		<Optimize>true</Optimize>
+		<DebugType>none</DebugType>
+		<PathMap>$(SolutionDir)=.</PathMap>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<ReferencePrivate>False</ReferencePrivate>
+	</PropertyGroup>
+	<PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Test'))">
+		<ReferencePrivate>True</ReferencePrivate>
+	</PropertyGroup>
+
+	<ItemGroup Condition="!$(MSBuildProjectName.Contains('.Generator'))">
+		<Reference Include="$(ElinPath)\BepInEx\core\BepInEx*.dll">
+			<Private>$(ReferencePrivate)</Private>
+		</Reference>
+		<Reference Include="$(ElinPath)\BepInEx\core\0Harmony.dll">
+			<Private>$(ReferencePrivate)</Private>
+		</Reference>
+		<Reference Include="$(ElinPath)\BepInEx\core\Mono*.dll">
+			<Private>$(ReferencePrivate)</Private>
+		</Reference>
+		<Reference Include="$(ElinPath)\Elin_Data\Managed\NPOI.dll">
+			<Private>$(ReferencePrivate)</Private>
+		</Reference>
+		<Reference Include="$(ElinPath)\Elin_Data\Managed\UnityEngine*.dll">
+			<Private>$(ReferencePrivate)</Private>
+		</Reference>
+		<Reference Include="$(ElinPath)\Elin_Data\Managed\Elin.dll">
+			<Private>$(ReferencePrivate)</Private>
+		</Reference>
+		<Reference Include="$(ElinPath)\Elin_Data\Managed\Plugins*.dll">
+			<Private>$(ReferencePrivate)</Private>
+		</Reference>
+		<Reference Include="$(ElinPath)\Elin_Data\Managed\UniTask*.dll">
+			<Private>$(ReferencePrivate)</Private>
+		</Reference>
+		<Reference Include="$(ElinPath)\Elin_Data\Managed\Newtonsoft.Json.dll">
+			<Private>$(ReferencePrivate)</Private>
+		</Reference>
+	</ItemGroup>
+
+	<!-- Directory.Packages.props 使うほどではないがテスト系のライブラリは統一しておきたい -->
+	<ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Test'))">
+		<Using Include="Xunit" />
+
+		<PackageReference Include="coverlet.collector" Version="8.0.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
+		<PackageReference Include="NSubstitute" Version="5.3.0" />
+		<PackageReference Include="NSubstitute.Analyzers.CSharp" Version="1.0.17">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="xunit.v3" Version="3.2.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+</Project>

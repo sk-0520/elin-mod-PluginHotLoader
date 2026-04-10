@@ -1,0 +1,26 @@
+{
+    "html.format.wrapAttributes": "force-expand-multiline",
+    "markdownlint.configFile": ".markdownlint.json",
+    "markdownlint.run": "onType",
+    "markdownlint.lintWorkspaceGlobs": [
+        "**/*.md",
+        "**/*.instructions.md",
+        ".github/copilot-instructions.instructions.md",
+        "!**/*.code-search",
+        "!**/bower_components",
+        "!**/node_modules",
+        // Additional exclusions
+        "!**/.git",
+        "!**/vendor"
+    ],
+    "[markdown]": {
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": true,
+        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+    },
+    "[instructions]": {
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": true,
+        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+    }
+}

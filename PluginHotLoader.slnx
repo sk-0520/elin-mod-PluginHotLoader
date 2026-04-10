@@ -1,7 +1,8 @@
 <Solution>
   <Folder Name="/Items/">
-    <File Path="Directory.Build.props.user" />
-    <File Path="Directory.Build.targets.user" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="Elin.Plugin.Main.Assembly.xml" />
     <File Path="exclusion.dic" />
     <File Path="README.md" />
   </Folder>
