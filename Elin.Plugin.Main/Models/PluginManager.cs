@@ -13,10 +13,13 @@ namespace Elin.Plugin.Main.Models
     {
         #region define
 
-        const string OnDestroyMethodName = "OnDestroy";
-        const string AwakeMethodName = "Awake";
-        const string StartMethodName = "Start";
-        const string DebugMethodName = "PHL";
+        private static class MethodName
+        {
+            public const string OnDestroy = "OnDestroy";
+            public const string Awake = "Awake";
+            public const string Start = "Start";
+            public const string Debug = "PHL";
+        }
 
         #endregion
 
@@ -26,7 +29,7 @@ namespace Elin.Plugin.Main.Models
 
         #region function
 
-        private void CallMethodIfFound(Type type, BaseUnityPlugin plugin, string methodName)
+        private void CallMethodIfExists(Type type, BaseUnityPlugin plugin, string methodName)
         {
             ModHelper.WriteDev(methodName);
             var method = AccessTools.Method(type, methodName);
@@ -51,7 +54,7 @@ namespace Elin.Plugin.Main.Models
             // 破棄
             //ModHelper.WriteDebug("Object.DestroyImmediate");
             //Object.DestroyImmediate(plugin);
-            CallMethodIfFound(plugin.GetType(), plugin, OnDestroyMethodName);
+            CallMethodIfExists(plugin.GetType(), plugin, MethodName.OnDestroy);
 
             ModHelper.WriteDev("Remove");
             if (!ModManager.ListPluginObject.Remove(plugin))
@@ -77,9 +80,9 @@ namespace Elin.Plugin.Main.Models
             }
             ModManager.ListPluginObject.Add(newPlugin);
 
-            CallMethodIfFound(newPluginType, newPlugin, AwakeMethodName);
-            CallMethodIfFound(newPluginType, newPlugin, StartMethodName);
-            CallMethodIfFound(newPluginType, newPlugin, DebugMethodName);
+            CallMethodIfExists(newPluginType, newPlugin, MethodName.Awake);
+            CallMethodIfExists(newPluginType, newPlugin, MethodName.Start);
+            CallMethodIfExists(newPluginType, newPlugin, MethodName.Debug);
 
             return newPlugin;
         }

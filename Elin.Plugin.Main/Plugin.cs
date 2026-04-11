@@ -37,7 +37,7 @@ namespace Elin.Plugin.Main
         /// </summary>
         private void OnDestroyPlugin()
         {
-            //NOP
+            PluginWatcher?.Dispose();
         }
 
         private BaseUnityPlugin? FindPlugin(string pluginId) => ModManager.ListPluginObject
