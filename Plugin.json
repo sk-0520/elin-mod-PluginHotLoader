@@ -5,7 +5,7 @@
     "id": "sk.pluginhotloader",
     "author": "sk",
     "loadPriority": 100,
-    "elinVersion": "0.23.287",
+    "elinVersion": "0.23.295",
     "description": [
       "[JP] Mod 開発時のプラグインの再読み込みをある程度簡単にする Mod です。",
       "[EN] A mod that makes it easier to reload plugins during mod development.",
@@ -22,7 +22,7 @@
     ]
   },
   "mod": {
-    "version": "0.0.0",
+    "version": "1.0.0",
     "useDebugId": true,
     "log": "NUL"
   }

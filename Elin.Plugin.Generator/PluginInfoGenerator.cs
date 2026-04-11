@@ -173,13 +173,8 @@ namespace Elin.Plugin.Generator
                     [XmlIgnore]
                     public string[] Tags { get; set; } = {{(define.Package.Tags == null ? "[]" : "[" + string.Join(", ", define.Package.Tags.Select(a => sourceBuilder.ToStringLiteral(a))) + "]")}};
 
-                """
-                    + (string.IsNullOrWhiteSpace(define.Package.Visibility) ? string.Empty : $$"""
                     [XmlElement("visibility")]
-                    public string Visibility { get; set; } = {{sourceBuilder.ToStringLiteral(define.Package.Visibility)}};
-
-                """) +
-                    $$"""
+                    public string Visibility { get; set; } = {{sourceBuilder.ToStringLiteral(define.Package.Visibility ?? "Public")}};
 
                     private sealed class StringWriterUTF8 : StringWriter
                     {
@@ -262,9 +257,6 @@ namespace Elin.Plugin.Generator
                     public static readonly string[] Tags = {{(define.Package.Tags == null ? "[]" : "[" + string.Join(", ", define.Package.Tags.Select(a => sourceBuilder.ToStringLiteral(a))) + "]")}};
                 #pragma warning restore CS1570 // XML コメントの XML 形式が正しくありません
 
-                    {{(string.IsNullOrWhiteSpace(define.Package.Visibility)
-                    ? string.Empty
-                    : $$"""
                     {{docHeader("package", "visibility")}}
                     /// <remarks>
                     /// <para>アップロードしたModの公開範囲を指定できます。指定できる値は以下の通りです。</para>
@@ -275,8 +267,7 @@ namespace Elin.Plugin.Generator
                     /// <item>FriendsOnly</item>
                     /// </list>
                     /// </remarks>
-                    public static string Visibility { get; set; } = {{sourceBuilder.ToStringLiteral(define.Package.Visibility)}};
-                    """)}}
+                    public static string Visibility { get; set; } = {{sourceBuilder.ToStringLiteral(define.Package.Visibility ?? "Public")}};
                 }
 
                 internal static class Mod
