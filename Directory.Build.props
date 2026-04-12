@@ -1,5 +1,7 @@
 <Project>
 	<!-- テンプレート側設定項目 -->
 	<Import Project="Directory.Build.props.mod-template" />
-	<!-- 以下 Mod 開発者側設定項目 -->
+	<!-- Mod 開発者側設定項目 -->
+	<Import Project="Directory.Build.props.dev.xml" Condition="Exists('Directory.Build.props.dev.xml')" />
+	<!-- 以下 Mod 専用設定項目 -->
 </Project>

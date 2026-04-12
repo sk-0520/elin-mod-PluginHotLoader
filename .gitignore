@@ -7,9 +7,6 @@ project.lock.json
 *.pyc
 nupkg/
 
-# Visual Studio Code
-.vscode
-
 # Rider
 .idea
 
@@ -43,11 +40,18 @@ msbuild.wrn
 # 自動生成
 /*/@Assets/package.xml
 /*/@Assets/preview.jpg
+/dev-items/debug-dll
 # 生成処理を使う場合は ModHelp が本体
 /*/@Assets/LangMod/
-/dev-items/debug-dll
+
+# 開発者用
+/Plugin.dev.json
+/Directory.Build.props.dev.xml
+/Directory.Build.targets.dev.xml
+
+# 何や色々
 TestResult/
 TestResults/
 *.lnk
-Plugin.dev.json
+git-shell.bat
 
