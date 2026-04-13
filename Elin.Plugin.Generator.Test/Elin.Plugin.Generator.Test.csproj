@@ -11,5 +11,11 @@
 		</ProjectReference>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="PluginInfoGeneratorTest\PluginDevJsonTest\Plugin.dev.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 
 </Project>

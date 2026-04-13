@@ -7,7 +7,7 @@ using System.Text.Json;
 namespace Elin.Plugin.Generator
 {
     [Generator(LanguageNames.CSharp)]
-    public class PluginInfoGenerator : IIncrementalGenerator
+    internal class PluginInfoGenerator : IIncrementalGenerator
     {
         #region property
 
