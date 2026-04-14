@@ -30,6 +30,7 @@ namespace Elin.Plugin.Main
         {
             Setting.Instance = Setting.Bind(Config, new Setting());
             Harmony = harmony;
+            CallPatchAll = false;
         }
 
         /// <summary>

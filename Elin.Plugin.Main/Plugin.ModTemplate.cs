@@ -9,6 +9,18 @@ namespace Elin.Plugin.Main
     [BepInPlugin(Package.Id, Mod.Name, Mod.Version)]
     public partial class Plugin : BaseUnityPlugin
     {
+        #region property
+
+        /// <summary>
+        /// <see cref="Harmony.PatchAll()"/>を呼び出すか。
+        /// </summary>
+        /// <remarks>
+        /// <para>デフォルトの<see langword="true"/>で問題ない。</para>
+        /// </remarks>
+        private bool CallPatchAll { get; set; } = true;
+
+        #endregion
+
         #region function
 
         /// <summary>
@@ -23,8 +35,10 @@ namespace Elin.Plugin.Main
 
             AwakePlugin(harmony);
 
-            // 使わん
-            //harmony.PatchAll();
+            if (CallPatchAll)
+            {
+                harmony.PatchAll();
+            }
         }
 
         public void OnDestroy()

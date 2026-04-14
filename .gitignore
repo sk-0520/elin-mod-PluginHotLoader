@@ -42,7 +42,7 @@ msbuild.wrn
 /*/@Assets/preview.jpg
 /dev-items/debug-dll
 # 生成処理を使う場合は ModHelp が本体
-/*/@Assets/LangMod/
+/*/@Assets/LangMod/*/Text/Help/
 
 # 開発者用
 /Plugin.dev.json

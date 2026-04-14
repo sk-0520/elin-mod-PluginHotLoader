@@ -49,13 +49,18 @@ namespace Elin.Plugin.Main.PluginHelpers
         /// <summary>
         /// プラグイン用言語ヘルパー。
         /// </summary>
-        /// <remarks>言語定義は Localize.json を編集することで自動的に適用されます。</remarks>
+        /// <remarks>言語定義は Localization.json を編集することで自動的に適用されます。</remarks>
         internal static PluginLocalization Lang { get; } = new PluginLocalization();
 
         /// <summary>
         /// Elin ヘルパー。
         /// </summary>
         internal static ElinHelper Elin { get; } = new ElinHelper();
+
+        /// <summary>
+        /// 共通的な処理。
+        /// </summary>
+        internal static CommonHelper Common { get; } = new CommonHelper();
 
         /// <summary>
         /// メッセージ出力可能なシーンか。
