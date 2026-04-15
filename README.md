@@ -1,5 +1,7 @@
 # PluginHotLoader
 
+<https://steamcommunity.com/sharedfiles/filedetails/?id=3704670483>
+
 Mod 開発時にプラグインの再読み込みをサポートするための Mod です。
 
 色々挙動が怪しいので、ローカルで Mod 開発する際のみ使用してください。
