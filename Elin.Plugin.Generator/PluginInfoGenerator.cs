@@ -27,30 +27,18 @@ namespace Elin.Plugin.Generator
                 .Where(file => Path.GetFileName(file.Path) == GeneratorConstants.PluginInfoFileName)
                 .Select((file, _) => (file: file, json: file.GetText()?.ToString()))
                 .Where(a => a.json != null)
-                .Select((a, _) =>
-                {
-                    var define = JsonSerializer.Deserialize<PluginDefine>(a.json!, JsonSerializerOptions);
+                .Select((a, _) => JsonSerializer.Deserialize<PluginDefine>(a.json!, JsonSerializerOptions))
+                .Collect()
+                .Select((arr, _) => arr.FirstOrDefault())
+            ;
 
-                    if (define is not null)
-                    {
-                        var devPath = Path.Combine(Path.GetDirectoryName(a.file.Path), GeneratorConstants.PluginInfoDevFileName);
-                        if (File.Exists(devPath))
-                        {
-                            var devJson = File.ReadAllText(devPath);
-                            var devDefine = JsonSerializer.Deserialize<PluginDevDefine>(devJson, JsonSerializerOptions);
-                            if (devDefine is not null)
-                            {
-                                // たとえ空文字列でも未設定でないのであれば上書きする
-                                if (devDefine.Log is not null)
-                                {
-                                    define.Mod.Log = devDefine.Log;
-                                }
-                            }
-                        }
-                    }
-
-                    return define;
-                })
+            var devDefine = context.AdditionalTextsProvider
+                .Where(file => Path.GetFileName(file.Path) == GeneratorConstants.PluginInfoDevFileName)
+                .Select((file, _) => (file: file, json: file.GetText()?.ToString()))
+                .Where(a => a.json != null)
+                .Select((a, _) => JsonSerializer.Deserialize<PluginDevDefine>(a.json!, JsonSerializerOptions))
+                .Collect()
+                .Select((arr, _) => arr.FirstOrDefault())
             ;
 
             var macroProvider = context.AnalyzerConfigOptionsProvider
@@ -72,13 +60,22 @@ namespace Elin.Plugin.Generator
                 })
             ;
 
-            context.RegisterSourceOutput(define.Combine(macroProvider), (c, x) =>
+            context.RegisterSourceOutput(define.Combine(devDefine).Combine(macroProvider), (c, x) =>
             {
-                var define = x.Left;
+                var define = x.Left.Left;
+                var devDefine = x.Left.Right;
                 var macro = x.Right;
-                if (define == null)
+                if (define is null)
                 {
                     return;
+                }
+
+                if (devDefine is not null)
+                {
+                    if (devDefine.Log is not null)
+                    {
+                        define.Mod.Log = devDefine.Log;
+                    }
                 }
 
                 /*
