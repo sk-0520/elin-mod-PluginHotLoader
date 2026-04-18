@@ -1,8 +1,9 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Elin.Plugin.Generator
 {
@@ -243,36 +244,33 @@ namespace Elin.Plugin.Generator
         #endregion
     }
 
-    [Obsolete("XML ドキュメントコメントの手書きの限界が来た時に実装する予定")]
-    public class XmlDocumentElement
-    {
-        public XmlDocumentElement(string elementName)
-        {
-            ElementName = elementName;
-        }
-
-        #region property
-
-        public string ElementName { get; }
-        public Dictionary<string, string> Attributes { get; } = new Dictionary<string, string>();
-
-        #endregion
-    }
-
     public class XmlDocumentCommentBuilder
     {
         public XmlDocumentCommentBuilder(SourceBuilder sourceBuilder)
         {
             SourceBuilder = sourceBuilder;
+            NodeGenerator = new XmlNodeGenerator(this);
         }
 
         #region property
 
         private SourceBuilder SourceBuilder { get; }
+        private XmlNodeGenerator NodeGenerator { get; }
 
         #endregion
 
         #region function
+
+        public virtual string Escape(string s)
+        {
+            return s
+                .Replace("&", "&amp;")
+                .Replace("<", "&lt;")
+                .Replace(">", "&gt;")
+                .Replace("\"", "&quot;")
+                .Replace("'", "&apos;")
+            ;
+        }
 
         public virtual string ToDocumentComment(string s)
         {
@@ -297,6 +295,423 @@ namespace Elin.Plugin.Generator
         public IEnumerable<string> ToDocumentComments(string xml)
         {
             return ToDocumentComments(SourceBuilder.SplitLines(xml));
+        }
+
+        public string Build(Func<XmlNodeGenerator, IXmlDocumentNode> generator, bool applyDocumentComment)
+        {
+            var node = generator(NodeGenerator);
+            var xml = node.ToXmlString();
+            if (applyDocumentComment)
+            {
+                return SourceBuilder.JoinLines(ToDocumentComments(xml));
+            }
+
+            return xml;
+        }
+
+        public string Build(Func<XmlNodeGenerator, IXmlDocumentNode> generator) => Build(generator, true);
+
+
+        #endregion
+    }
+
+    public interface IXmlDocumentNode
+    {
+        #region property
+
+        string NodeName { get; }
+
+        #endregion
+
+        #region function
+
+        string ToXmlString();
+
+        #endregion
+    }
+
+    public class XmlDocumentText : IXmlDocumentNode
+    {
+        public XmlDocumentText(string content, XmlDocumentCommentBuilder xmlBuilder)
+        {
+            Content = content;
+            XmlBuilder = xmlBuilder;
+        }
+
+        #region property
+
+        private XmlDocumentCommentBuilder XmlBuilder { get; }
+        public string Content { get; }
+
+        #endregion
+
+        #region IXmlDocumentNode
+
+        public string NodeName => "#text";
+
+        public string ToXmlString()
+        {
+            return XmlBuilder.Escape(Content);
+        }
+
+        #endregion
+    }
+
+    public class XmlDocumentComment : IXmlDocumentNode
+    {
+        public XmlDocumentComment(string comment)
+        {
+            Comment = comment;
+        }
+
+        #region property
+
+        public string Comment { get; }
+
+        #endregion
+
+        #region IXmlDocumentNode
+
+        public string NodeName => "#comment";
+
+        public string ToXmlString()
+        {
+            var comment = Comment;
+            if (comment.Contains("--"))
+            {
+                // XML コメント内で "--" は使用できないので、U+2013(EN DASH) に置換する
+                comment = comment.Replace("--", "––");
+            }
+
+            return "<!-- " + comment + " -->";
+        }
+
+        #endregion
+    }
+
+    public class XmlDocumentFragment : IXmlDocumentNode
+    {
+        public XmlDocumentFragment(IReadOnlyCollection<IXmlDocumentNode> children)
+        {
+            Children = children;
+        }
+
+        #region property
+
+        public IReadOnlyCollection<IXmlDocumentNode> Children { get; }
+
+        #endregion
+
+        #region IXmlDocumentNode
+
+        public string NodeName => "#fragment";
+
+        public string ToXmlString()
+        {
+            return string.Join(string.Empty, Children.Select(a => a.ToXmlString()));
+        }
+
+        #endregion
+    }
+
+    public class XmlDocumentCData : IXmlDocumentNode // MDN では Text が親だけど、やってらんねーってことで。
+    {
+        public XmlDocumentCData(string content)
+        {
+            Content = content;
+        }
+
+        #region property
+
+        public string Content { get; }
+
+        #endregion
+
+        #region IXmlDocumentNode
+
+        public string NodeName => "#cdata-section";
+
+        public string ToXmlString()
+        {
+            return "<![CDATA[" + Content + "]]>";
+        }
+
+        #endregion
+    }
+
+    public class XmlDocumentElement : IXmlDocumentNode
+    {
+        public XmlDocumentElement(string elementName, IReadOnlyCollection<IXmlDocumentNode> children, XmlDocumentCommentBuilder xmlBuilder)
+        {
+            ElementName = elementName;
+            Children = children;
+            XmlBuilder = xmlBuilder;
+        }
+
+        #region property
+
+        private XmlDocumentCommentBuilder XmlBuilder { get; }
+        public string ElementName { get; }
+        public IReadOnlyCollection<IXmlDocumentNode> Children { get; }
+        public Dictionary<string, string> Attributes { get; set;/* init 扱い*/ } = new Dictionary<string, string>();
+
+        #endregion
+
+        #region IXmlDocumentNode
+
+        public string NodeName => ElementName;
+
+        public string ToXmlString()
+        {
+            var result = new StringBuilder();
+
+            result.Append('<');
+            result.Append(ElementName);
+
+            if (0 < Attributes.Count)
+            {
+                // テストやらの都合で順序は保証しておく
+                foreach (var pair in Attributes.OrderBy(k => k.Key))
+                {
+                    result.Append(' ');
+                    result.Append(pair.Key);
+                    result.Append('=');
+                    result.Append('"');
+                    result.Append(XmlBuilder.Escape(pair.Value));
+                    result.Append('"');
+                }
+            }
+
+            if (0 < Children.Count)
+            {
+                result.Append('>');
+
+                foreach (var child in Children)
+                {
+                    result.Append(child.ToXmlString());
+                }
+
+                result.Append("</");
+                result.Append(ElementName);
+                result.Append('>');
+            }
+            else
+            {
+                result.Append(" />");
+            }
+
+            return result.ToString();
+        }
+
+        #endregion
+    }
+
+    public enum XmlDocumentListType
+    {
+        Bullet,
+        Number,
+    }
+
+    public class XmlNodeGenerator
+    {
+        public XmlNodeGenerator(XmlDocumentCommentBuilder xmlBuilder)
+        {
+            XmlBuilder = xmlBuilder;
+        }
+
+        #region property
+
+        private XmlDocumentCommentBuilder XmlBuilder { get; }
+
+        #endregion
+
+        #region function
+
+        private IReadOnlyCollection<IXmlDocumentNode> GetCollection(IEnumerable<IXmlDocumentNode> nodes)
+        {
+            if (nodes is IReadOnlyCollection<IXmlDocumentNode> raw)
+            {
+                return raw;
+            }
+
+            return nodes.ToArray();
+        }
+
+        public XmlDocumentFragment Fragment(IEnumerable<IXmlDocumentNode> nodes)
+        {
+            return new XmlDocumentFragment(GetCollection(nodes));
+        }
+
+        public XmlDocumentText Text(string content)
+        {
+            return new XmlDocumentText(content, XmlBuilder);
+        }
+
+        public XmlDocumentComment Comment(string content)
+        {
+            return new XmlDocumentComment(content);
+        }
+
+        public XmlDocumentElement Summary(string content)
+        {
+            return new XmlDocumentElement("summary", [new XmlDocumentText(content, XmlBuilder)], XmlBuilder);
+        }
+
+        public XmlDocumentElement Param(string name, IEnumerable<IXmlDocumentNode> nodes)
+        {
+            var element = new XmlDocumentElement("param", GetCollection(nodes), XmlBuilder);
+            element.Attributes["name"] = name;
+            return element;
+        }
+
+        public XmlDocumentElement Param(string name, string content)
+        {
+            return Param(name, [new XmlDocumentText(content, XmlBuilder)]);
+        }
+
+        public XmlDocumentElement Paragraph(string content)
+        {
+            var element = new XmlDocumentElement("para", [new XmlDocumentText(content, XmlBuilder)], XmlBuilder);
+            return element;
+        }
+
+        public XmlDocumentElement Paragraph(IEnumerable<IXmlDocumentNode> nodes)
+        {
+            var element = new XmlDocumentElement("para", GetCollection(nodes), XmlBuilder);
+            return element;
+        }
+
+        public XmlDocumentElement Remarks(IEnumerable<IXmlDocumentNode> nodes)
+        {
+            return new XmlDocumentElement("remarks", GetCollection(nodes), XmlBuilder);
+        }
+
+        public XmlDocumentElement Remarks(IEnumerable<string> content)
+        {
+            return Remarks(content.Select(a => Paragraph(a)));
+        }
+
+        public XmlDocumentElement Remarks(string content)
+        {
+            return Remarks([new XmlDocumentText(content, XmlBuilder)]);
+        }
+
+        private XmlDocumentElement SeeCore(string attribute, string value, string? content)
+        {
+            var children = content is null ? Array.Empty<IXmlDocumentNode>() : [new XmlDocumentText(content, XmlBuilder)];
+            var element = new XmlDocumentElement("see", children, XmlBuilder);
+            element.Attributes[attribute] = value;
+            return element;
+        }
+
+        public XmlDocumentElement SeeCref(string cref)
+        {
+            return SeeCore("cref", cref, null);
+        }
+
+        public XmlDocumentElement SeeLangword(string keyword)
+        {
+            return SeeCore("langword", keyword, null);
+        }
+
+        public XmlDocumentElement SeeHref(string href, string? content = null)
+        {
+            return SeeCore("href", href, content);
+        }
+
+        private XmlDocumentElement SeeAlsoCore(string attribute, string value, string? content)
+        {
+            var children = content is null ? Array.Empty<IXmlDocumentNode>() : [new XmlDocumentText(content, XmlBuilder)];
+            var element = new XmlDocumentElement("seealso", children, XmlBuilder);
+            element.Attributes[attribute] = value;
+            return element;
+        }
+
+        public XmlDocumentElement SeeAlsoCref(string cref)
+        {
+            return SeeAlsoCore("cref", cref, null);
+        }
+
+        public XmlDocumentElement SeeAlsoHref(string href, string? content = null)
+        {
+            return SeeAlsoCore("href", href, content);
+        }
+
+        private XmlDocumentElement ListCore(string type, KeyValuePair<IXmlDocumentNode, IXmlDocumentNode>? header, IEnumerable<KeyValuePair<IXmlDocumentNode, IXmlDocumentNode?>> items)
+        {
+            var children = new List<IXmlDocumentNode>();
+            if (header.HasValue)
+            {
+                var t = header.Value.Key;
+                var d = header.Value.Value;
+                var element = new XmlDocumentElement(
+                    "listheader",
+                    [
+                        new XmlDocumentElement("term", [t], XmlBuilder),
+                        new XmlDocumentElement("description", [d], XmlBuilder),
+                    ],
+                    XmlBuilder
+                );
+                children.Add(element);
+            }
+
+            foreach (var item in items)
+            {
+                var t = item.Key;
+                var d = item.Value;
+                var element = new XmlDocumentElement(
+                    "item",
+                    header.HasValue && d is not null ? [
+                        new XmlDocumentElement("term", [t], XmlBuilder),
+                        new XmlDocumentElement("description", [d], XmlBuilder),
+                    ] : [t],
+                XmlBuilder
+                );
+                children.Add(element);
+            }
+
+            var result = new XmlDocumentElement("list", children, XmlBuilder);
+            result.Attributes["type"] = type;
+
+            return result;
+        }
+
+        public XmlDocumentElement List(XmlDocumentListType listType, IEnumerable<KeyValuePair<string, string>> items)
+        {
+            var type = listType == XmlDocumentListType.Bullet ? "bullet" : "number";
+            var itemNodes = items.Select(a => new KeyValuePair<IXmlDocumentNode, IXmlDocumentNode?>(new XmlDocumentText(a.Key, XmlBuilder), new XmlDocumentText(a.Value, XmlBuilder)));
+            return ListCore(type, default, itemNodes);
+        }
+
+        public XmlDocumentElement List(XmlDocumentListType listType, IEnumerable<IXmlDocumentNode> nodes)
+        {
+            var type = listType == XmlDocumentListType.Bullet ? "bullet" : "number";
+            var itemNodes = nodes.Select(a => new KeyValuePair<IXmlDocumentNode, IXmlDocumentNode?>(a, null));
+            return ListCore(type, default, itemNodes);
+        }
+
+        public XmlDocumentElement List(XmlDocumentListType listType, IEnumerable<string> items)
+        {
+            return List(listType, items.Select(a => new XmlDocumentText(a, XmlBuilder)));
+        }
+
+        public XmlDocumentElement Table(KeyValuePair<string, string> header, IEnumerable<KeyValuePair<string, string>> items)
+        {
+            var headerNode = new KeyValuePair<IXmlDocumentNode, IXmlDocumentNode>(new XmlDocumentText(header.Key, XmlBuilder), new XmlDocumentText(header.Value, XmlBuilder));
+            var itemNodes = items.Select(a => new KeyValuePair<IXmlDocumentNode, IXmlDocumentNode?>(new XmlDocumentText(a.Key, XmlBuilder), new XmlDocumentText(a.Value, XmlBuilder)));
+            return ListCore("table", headerNode, itemNodes);
+        }
+
+        public XmlDocumentElement Returns(string content)
+        {
+            return new XmlDocumentElement("returns", [new XmlDocumentText(content, XmlBuilder)], XmlBuilder);
+        }
+
+        public XmlDocumentElement InheritDoc(string cref)
+        {
+            var result = new XmlDocumentElement("inheritdoc", [], XmlBuilder);
+            result.Attributes["cref"] = cref;
+            return result;
         }
 
         #endregion

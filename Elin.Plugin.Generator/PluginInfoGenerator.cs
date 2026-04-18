@@ -19,6 +19,7 @@ namespace Elin.Plugin.Generator
         };
 
         #endregion
+
         #region IIncrementalGenerator
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -108,9 +109,7 @@ namespace Elin.Plugin.Generator
 
                 string docHeader(string parent, string property)
                 {
-                    return $$"""
-                    /// <summary>{{GeneratorConstants.PluginInfoFileName}}: $.{{parent}}.{{property}}</summary>
-                    """;
+                    return sourceBuilder.Xml.Build(g => g.Summary($"{GeneratorConstants.PluginInfoFileName}: $.{parent}.{property}"));
                 }
 
                 //lang=c#
@@ -125,11 +124,17 @@ namespace Elin.Plugin.Generator
                 namespace {{GeneratorConstants.GeneratedNamespace}};
 
                 #pragma warning disable CS1591 // XML コメントがありません
-                /// <summary>
-                /// package.xml を生成するためだけのクラス。
-                /// </summary>
-                /// <remarks><see langword="public" />だがプラグイン側では使用せず、ビルド時のみ使用する想定。</remarks>
-                /// <see cref="Package"/>
+                {{sourceBuilder.Xml.Build(g =>
+                {
+                    return g.Fragment([
+                        g.Summary("package.xml を生成するためだけのクラス。"),
+                        g.Remarks([
+                            g.SeeLangword("public"),
+                            g.Text("だがプラグイン側では使用せず、ビルド時のみ使用する想定。")
+                        ]),
+                        g.SeeAlsoCref("Package")
+                    ]);
+                })}}
                 [XmlRoot("Meta")]
                 public class MsBuildOnlyPackageXml
                 {
@@ -196,24 +201,24 @@ namespace Elin.Plugin.Generator
                     }
                 }
                 #pragma warning restore CS1591 // XML コメントがありません
-                
-                /// <summary>
-                /// package.xml 参照情報。
-                /// </summary>
-                /// <seealso href="https://docs.google.com/document/d/e/2PACX-1vQSITB8aYTycrnn3PxxGnPjNZ2_y1G3LDfXjC_PM5S_mTPCh6fv1vcj1bkfPbbUZ88WVb5_7T-62zYc/pub" />
+
+                {{sourceBuilder.Xml.Build(g => g.Fragment([
+                    g.Summary("package.xml 参照情報。"),
+                    g.SeeAlsoHref("https://docs.google.com/document/d/e/2PACX-1vQSITB8aYTycrnn3PxxGnPjNZ2_y1G3LDfXjC_PM5S_mTPCh6fv1vcj1bkfPbbUZ88WVb5_7T-62zYc/pub"),
+                ]))}}
                 internal static class Package
                 {
                     {{docHeader("package", "title")}}
-                    /// <remarks>
-                    /// <para>このタグの中には、あなたのModのタイトルを記入してください。最初にWorkshopにModをアップロードする際に、ここで記述されたテキストがModのタイトルとして表示されます。</para>
-                    /// <para>Modを更新する際は、このテキストは無視されます。タイトルの変更が必要な場合は、Workshopから変更してください。</para>
-                    /// </remarks>
+                    {{sourceBuilder.Xml.Build(g => g.Remarks([
+                        "このタグの中には、あなたのModのタイトルを記入してください。最初にWorkshopにModをアップロードする際に、ここで記述されたテキストがModのタイトルとして表示されます。",
+                        "Modを更新する際は、このテキストは無視されます。タイトルの変更が必要な場合は、Workshopから変更してください。"
+                    ]))}}
                     public const string Title = {{sourceBuilder.ToStringLiteral(define.Package.Title)}};
 
                     {{docHeader("package", "id")}}
-                    /// <remarks>
-                    /// <para>ここでは、あなたのModを識別するためのユニークなIDを考えて記入してください。既に存在するModとIDが被っている場合は、Modはアップロードできません。IDは、容易に被らないような名前が好ましいです。</para>
-                    /// </remarks>
+                    {{sourceBuilder.Xml.Build(g => g.Remarks([
+                        "ここでは、あなたのModを識別するためのユニークなIDを考えて記入してください。既に存在するModとIDが被っている場合は、Modはアップロードできません。IDは、容易に被らないような名前が好ましいです。"
+                    ]))}}
                     public const string Id = {{sourceBuilder.ToStringLiteral(define.Package.Id)}}
                 #if DEBUG
                     + {{(define.Mod.UseDebugId ? $"{sourceBuilder.ToStringLiteral(".debug")}" : sourceBuilder.EmptyStringLiteral)}}
@@ -221,82 +226,88 @@ namespace Elin.Plugin.Generator
                     ;
                 
                     {{docHeader("package", "author")}}
-                    /// <remarks>
-                    /// <para>あなたの作者名を記述してください。何でも構いません。</para>
-                    /// </remarks>
+                    {{sourceBuilder.Xml.Build(g => g.Remarks([
+                        "あなたの作者名を記述してください。何でも構いません。"
+                    ]))}}
                     public const string Author = {{sourceBuilder.ToStringLiteral(define.Package.Author)}};
 
                     {{docHeader("package", "loadPriority")}}
-                    /// <remarks>
-                    /// <para>Modがロードされる順番を指定します。0～任意の数字を記述してください。数字が低いModほど先に読み込まれます。</para>
-                    /// </remarks>
+                    {{sourceBuilder.Xml.Build(g => g.Remarks([
+                        "Modがロードされる順番を指定します。0～任意の数字を記述してください。数字が低いModほど先に読み込まれます。"
+                    ]))}}
                     public const int LoadPriority = {{define.Package.LoadPriority}};
 
                     {{docHeader("package", "version")}}
-                    /// <remarks>
-                    /// <para>あなたのModの動作が最後に確認できたElin本体のバージョンを記述してください。現在のところは、面倒なら頻繁にバージョンの記述は更新しなくてもかまいません。</para>
-                    /// <para>Elin本体にModに関わる大きな変更があった場合、その時の本体のバージョンより古いバージョンが記述されているModは読み込まれなくなります。</para>
-                    /// </remarks>
+                    {{sourceBuilder.Xml.Build(g => g.Remarks([
+                        "あなたのModの動作が最後に確認できたElin本体のバージョンを記述してください。現在のところは、面倒なら頻繁にバージョンの記述は更新しなくてもかまいません。",
+                        "Elin本体にModに関わる大きな変更があった場合、その時の本体のバージョンより古いバージョンが記述されているModは読み込まれなくなります。"
+                    ]))}}
                     public const string Version = {{sourceBuilder.ToStringLiteral(define.Package.ElinVersion)}};
 
                     {{docHeader("package", "description")}}
-                    /// <remarks>
-                    /// <para>あなたのModの説明文です。最初にWorkshopにModをアップロードする際に、ここで記述されたテキストがModの説明文として表示されます。Modを更新する際は、このテキストは無視されます。説明文の変更が必要な場合は、Workshopから変更してください。</para>
-                    /// </remarks>
+                    {{sourceBuilder.Xml.Build(g => g.Remarks([
+                        "あなたのModの説明文です。最初にWorkshopにModをアップロードする際に、ここで記述されたテキストがModの説明文として表示されます。Modを更新する際は、このテキストは無視されます。説明文の変更が必要な場合は、Workshopから変更してください。"
+                    ]))}}
                     public const string Description = {{sourceBuilder.ToStringLiteral(sourceBuilder.JoinLines(define.Package.Description))}};
 
-                #pragma warning disable CS1570 // XML コメントの XML 形式が正しくありません
                     {{docHeader("package", "tags")}}
-                    /// <remarks>
-                    /// <para>Workshopに登録するタグをカンマ区切りで指定します（複数ある場合）。任意のタグを登録しても構いません。公式タグを設定すると、Workshopのカテゴリに表示されるようになります。詳しくはElin Workshop Tagをご覧ください。</para>
-                    /// </remarks>
-                    /// <seealso href="https://docs.google.com/document/u/0/d/15XNbNsMmv1SPfFaomMq_crvJsOaBxhg-mb6JiaE1z4I/edit&sa=D&source=editors&ust=1774327536481473&usg=AOvVaw3pWzcZXUsacwVbBd511J4p" />
+                    {{sourceBuilder.Xml.Build(g => g.Fragment([
+                        g.Remarks([
+                            "Workshopに登録するタグをカンマ区切りで指定します（複数ある場合）。任意のタグを登録しても構いません。公式タグを設定すると、Workshopのカテゴリに表示されるようになります。詳しくはElin Workshop Tagをご覧ください。"
+                        ]),
+                        g.SeeAlsoHref("https://docs.google.com/document/u/0/d/15XNbNsMmv1SPfFaomMq_crvJsOaBxhg-mb6JiaE1z4I/edit&sa=D&source=editors&ust=1774327536481473&usg=AOvVaw3pWzcZXUsacwVbBd511J4p")
+                    ]))}}
                     public static readonly string[] Tags = {{(define.Package.Tags == null ? "[]" : "[" + string.Join(", ", define.Package.Tags.Select(a => sourceBuilder.ToStringLiteral(a))) + "]")}};
-                #pragma warning restore CS1570 // XML コメントの XML 形式が正しくありません
 
                     {{docHeader("package", "visibility")}}
-                    /// <remarks>
-                    /// <para>アップロードしたModの公開範囲を指定できます。指定できる値は以下の通りです。</para>
-                    /// <list type="bullet">
-                    /// <item>Public</item>
-                    /// <item>Unlisted</item>
-                    /// <item>Private</item>
-                    /// <item>FriendsOnly</item>
-                    /// </list>
-                    /// </remarks>
+                    {{sourceBuilder.Xml.Build(g => g.Remarks([
+                        g.Paragraph("アップロードしたModの公開範囲を指定できます。指定できる値は以下の通りです。"),
+                        g.List(XmlDocumentListType.Bullet, [
+                            "Public",
+                            "Unlisted",
+                            "Private",
+                            "FriendsOnly",
+                        ])
+                    ]))}}
                     public static string Visibility { get; set; } = {{sourceBuilder.ToStringLiteral(define.Package.Visibility ?? "Public")}};
                 }
 
                 internal static class Mod
                 {
                     {{docHeader("mod", "name")}}
-                    /// <remarks>
-                    /// <para>MOD の内部名です。</para>
-                    /// <para>アセンブリ名を参照しています。</para>
-                    /// </remarks>
+                    {{sourceBuilder.Xml.Build(g => g.Remarks([
+                        "MOD の内部名です。",
+                        "アセンブリ名を参照しています。"
+                    ]))}}
                     public const string Name = {{sourceBuilder.ToStringLiteral(macro.AssemblyName)}};
                     {{docHeader("mod", "version")}}
-                    /// <remarks>
-                    /// <para>作成している MOD のバージョンです。</para>
-                    /// <para>アセンブリバージョンにも適用されます。</para>
-                    /// </remarks>
+                    {{sourceBuilder.Xml.Build(g => g.Remarks([
+                        "作成している MOD のバージョンです。",
+                        "アセンブリバージョンにも適用されます。"
+                    ]))}}
                     public const string Version = {{sourceBuilder.ToStringLiteral(define.Mod.Version)}};
 
                     {{docHeader("mod", "useDebugId")}}
-                    /// <remarks>デバッグ時に Mod の ID を変更するか</remarks>
+                    {{sourceBuilder.Xml.Build(g => g.Remarks("デバッグ時に Mod の ID を変更するか"))}}
                     public const bool UseDebugId = {{define.Mod.UseDebugId.ToString().ToLowerInvariant()}};
                 
                 #if DEBUG
                     {{docHeader("mod", "log")}}
-                    /// <remarks>
-                    /// <para>デバッグ時に出力されるファイルパス。</para>
-                    /// </remarks>
-                    /// <remarks><see cref="IsEnabledLogFile"/> が有効な場合に使用可能です。</remarks>
+                    {{sourceBuilder.Xml.Build(g => g.Remarks([
+                        g.Paragraph("デバッグ時に出力されるファイルパス。"),
+                        g.Paragraph([
+                            g.SeeCref("IsEnabledLogFile"),
+                            g.Text("が有効な場合に使用可能です。"),
+                        ]),
+                    ]))}}
                     public const string LogFile = {{(string.IsNullOrWhiteSpace(define.Mod.Log) ? sourceBuilder.ToStringLiteral("") : sourceBuilder.ToStringLiteral(Environment.ExpandEnvironmentVariables(define.Mod.Log)))}};
 
-                    /// <remarks>
-                    /// <see cref="LogFile"/> が有効かどうかを示します。
-                    /// </remarks>
+                    {{sourceBuilder.Xml.Build(g => g.Remarks([
+                        g.Paragraph([
+                            g.SeeCref("LogFile"),
+                            g.Text("が有効かどうかを示します。"),
+                        ]),
+                    ]))}}
                     public static bool IsEnabledLogFile => !string.IsNullOrWhiteSpace(LogFile) && !LogFile.Equals("NUL", StringComparison.OrdinalIgnoreCase);
 
                 #endif

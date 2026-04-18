@@ -17,7 +17,7 @@
       "additionalProperties": false,
       "description": "単独で使用される文字列",
       "patternProperties": {
-        "^[a-z][a-zA-Z0-9_]+$": {
+        "^[A-Z][a-z0-9_][a-zA-Z0-9_]*$": {
           "type": "object",
           "additionalProperties": false,
           "description": "key",
@@ -55,7 +55,7 @@
       "description": "書式変換元文字列",
       "additionalProperties": false,
       "patternProperties": {
-        "^[a-z][a-zA-Z0-9_]+$": {
+        "^[A-Z][a-z0-9_][a-zA-Z0-9_]*$": {
           "type": "object",
           "additionalProperties": false,
           "description": "key",

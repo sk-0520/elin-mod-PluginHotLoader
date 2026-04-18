@@ -81,19 +81,12 @@ namespace Elin.Plugin.Generator
             );
         }
 
-        private IEnumerable<string> ToRawXmlComments(LocalizationItem item)
+        IXmlDocumentNode GenerateLanguageSamples(XmlNodeGenerator generator, LocalizationItem item)
         {
-            return new[] {
-                "<list type=\"table\">",
-                "<listheader>",
-                "<term>言語</term>",
-                "<description>翻訳</description>",
-                "</listheader>",
-            }.Concat(item.Languages
-                .Select(a => $"<item><term>{a.Key}</term><description>{a.Value}</description></item>")
-            ).Concat(new[] {
-                 "</list>",
-            });
+            return generator.Table(
+                new KeyValuePair<string, string>("言語", "翻訳"),
+                item.Languages.Select(a => new KeyValuePair<string, string>(a.Key, a.Value ?? string.Empty))
+            );
         }
 
         private string GeneratePluginLocalizationGroup(SourceBuilder sourceBuilder, string className, IReadOnlyDictionary<string, LocalizationItem> items, Func<string>? classExtension = null)
@@ -141,17 +134,10 @@ namespace Elin.Plugin.Generator
 
                         return $$"""
 
-                        {{sourceBuilder.ApplyXmlDocumentComment(
-                            string.Empty,
-                            $$"""
-                            <summary>
-                            `{{a.Key}}` に対応するローカライズされた文字列を取得します。
-                            </summary>
-                            <remarks>
-                            {{sourceBuilder.JoinLines(ToRawXmlComments(a.Value))}}
-                            </remarks>
-                            """
-                        )}}
+                        {{sourceBuilder.Xml.Build(g => g.Fragment([
+                            g.Summary($"`{a.Key}` に対応するローカライズされた文字列を取得します。"),
+                            g.Remarks([GenerateLanguageSamples(g, a.Value)])
+                        ]))}}
                         public string {{ToPascalCase(a.Key)}} => Items[{{sourceBuilder.ToStringLiteral(a.Key)}}].GetText(LanguageSystem);
 
                         """;
@@ -220,16 +206,16 @@ namespace Elin.Plugin.Generator
                 {
                     #region property
 
-                    /// <summary>
-                    /// 現在システム側が使用している言語。
-                    /// </summary>
-                    /// <seealso cref="global::Lang.langCode" />
+                    {{sourceBuilder.Xml.Build(g => g.Fragment([
+                        g.Summary("現在システム側が使用している言語。"),
+                        g.SeeAlsoCref("global::Lang.langCode"),
+                    ]))}}
                     public string LangCode { get; }
 
-                    /// <seealso cref="global::Lang.isJP" />
+                    {{sourceBuilder.Xml.Build(g => g.SeeAlsoCref("global::Lang.isJP"))}}
                     public bool IsJP { get; }
 
-                    /// <seealso cref="global::Lang.isEN" />
+                    {{sourceBuilder.Xml.Build(g => g.SeeAlsoCref("global::Lang.isEN"))}}
                     public bool IsEN { get; }
                 
                     #endregion
@@ -361,31 +347,27 @@ namespace Elin.Plugin.Generator
 
                                 return $$"""
 
-                                /// <summary>
-                                /// {{a.Key}} に対応するローカライズされた文字列を、指定したパラメーターでフォーマットして取得します。
-                                /// </summary>
-                                /// <remarks>
-                                {{sourceBuilder.JoinLines(sourceBuilder.Xml.ToDocumentComments(ToRawXmlComments(a.Value)))}}
-                                /// </remarks>
-                                /// <param name="parameters">
-                                /// 対象キー:
-                                /// <list type="bullet">
-                                /// {{sourceBuilder.JoinLines(
-                                        baseFormatParameters
-                                            .Select(a => "<item>" + a + "</item>")
-                                            .Select(a => sourceBuilder.Xml.ToDocumentComment(a))
-                                    )}}
-                                /// </list>
-                                /// </param>
-                                /// <returns>フォーマットされた文字列</returns>
+                                {{sourceBuilder.Xml.Build(g => g.Fragment([
+                                    g.Summary($"{a.Key} に対応するローカライズされた文字列を、指定したパラメーターでフォーマットして取得します。"),
+                                    g.Remarks([GenerateLanguageSamples(g, a.Value)]),
+                                    g.Param("parameters", [
+                                        g.Text("対象キー:"),
+                                        g.List(XmlDocumentListType.Bullet, baseFormatParameters)
+                                    ]),
+                                    g.Returns("フォーマットされた文字列"),
+                                ]))}}
                                 public string Format{{ToPascalCase(a.Key)}}(IReadOnlyDictionary<string, string> parameters)
                                 {
                                     var item = Items[{{sourceBuilder.ToStringLiteral(a.Key)}}];
                                     var format = item.GetText(LanguageSystem);
                                     return Format(format, parameters);
                                 }
-                                /// <inheritdoc cref="Format{{ToPascalCase(a.Key)}}(IReadOnlyDictionary{string, string})" />
-                                {{sourceBuilder.JoinLines(a.Value.Parameters.Select(kv => $"/// <param name=\"{ToParameterName(kv.Key)}\">{kv.Value}</param>"))}}
+                                {{sourceBuilder.Xml.Build(g => g.Fragment([
+                                    g.InheritDoc($"Format{ToPascalCase(a.Key)}(IReadOnlyDictionary{{string, string}})"),
+                                    g.Fragment(
+                                        a.Value.Parameters.Select(kv => g.Param(ToParameterName(kv.Key), kv.Value.ToString()))
+                                    )
+                                ]))}}
                                 [{{GeneratorConstants.GeneratedNamespace}}.{{GeneratorConstants.RequireNamedArgumentsAttributeName}}]
                                 public string Format{{ToPascalCase(a.Key)}}({{string.Join(", ", a.Value.Parameters.Select(kv => $"{kv.Value.Type} {ToParameterName(kv.Key)}"))}})
                                 {
@@ -441,15 +423,15 @@ namespace Elin.Plugin.Generator
 
                     #region property
 
-                    /// <summary>
-                    /// 一般的なローカライズされた文字列を取得します。
-                    /// </summary>
-                    /// <remarks>{{GeneratorConstants.LocalizeFileName}}: $.general</remarks>
+                    {{sourceBuilder.Xml.Build(g => g.Fragment([
+                       g.Summary("一般的なローカライズされた文字列を取得します。"),
+                          g.Remarks($"{GeneratorConstants.LocalizeFileName}: $.general")
+                    ]))}}
                     public PluginLocalizationGeneral General { get; }
-                    /// <summary>
-                    /// フォーマット用のローカライズされた文字列を取得します。
-                    /// </summary>
-                    /// <remarks>{{GeneratorConstants.LocalizeFileName}}: $.format</remarks>
+                    {{sourceBuilder.Xml.Build(g => g.Fragment([
+                       g.Summary("フォーマット用のローカライズされた文字列を取得します。"),
+                          g.Remarks($"{GeneratorConstants.LocalizeFileName}: $.format")
+                    ]))}}
                     public PluginLocalizationFormatter Formatter { get; }
 
                     #endregion

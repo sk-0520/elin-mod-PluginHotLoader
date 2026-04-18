@@ -1,39 +1,39 @@
 {
-  "$schema": "./dev-items/localization.schema.json",
+  "$schema": "./dev-items/Localization.schema.json",
   "general": {
-    "pluginIdNotSet": {
+    "PluginIdNotSet": {
       "JP": "プラグイン ID 未設定",
       "EN": "Plugin ID not set",
       "CN": "未设置插件 ID"
     },
-    "stopIt": {
+    "StopIt": {
       "JP": "やめろ",
       "EN": "Stop it",
       "CN": "別這樣"
     },
-    "alreadyWaiting": {
+    "AlreadyWaiting": {
       "JP": "読み込み待機中",
       "EN": "Already waiting for loading",
       "CN": "已在等待加载"
     },
-    "refreshPreStart": {
+    "RefreshPreStart": {
       "JP": "更新開始",
       "EN": "Refresh start",
       "CN": "开始刷新"
     },
-    "refreshEnd": {
+    "RefreshEnd": {
       "JP": "更新終了",
       "EN": "Refresh end",
       "CN": "刷新结束"
     },
-    "failedRemove": {
+    "FailedRemove": {
       "JP": "削除失敗",
       "EN": "Failed to remove",
       "CN": "删除失败"
     }
   },
   "format": {
-    "pluginFound": {
+    "PluginFound": {
       "JP": "プラグイン発見: ${PLUGIN_ID}",
       "EN": "Plugin found: ${PLUGIN_ID}",
       "CN": "发现插件: ${PLUGIN_ID}",
@@ -43,7 +43,7 @@
         }
       }
     },
-    "pluginNotFound": {
+    "PluginNotFound": {
       "JP": "プラグイン未発見: ${PLUGIN_ID}",
       "EN": "Plugin not found: ${PLUGIN_ID}",
       "CN": "未发现插件: ${PLUGIN_ID}",
@@ -53,7 +53,7 @@
         }
       }
     },
-    "skipRefresh": {
+    "SkipRefresh": {
       "JP": "ハッシュ値が同じため更新をスキップ(${HASH})",
       "EN": "Refresh skipped due to identical hash (${HASH})",
       "CN": "由于哈希值相同，刷新被跳过 (${HASH})",
@@ -63,7 +63,7 @@
         }
       }
     },
-    "refreshStart": {
+    "RefreshStart": {
       "JP": "更新開始(${COUNT})",
       "EN": "Refresh start(${COUNT})",
       "CN": "开始刷新(${COUNT})",
@@ -73,7 +73,7 @@
         }
       }
     },
-    "methodStart": {
+    "MethodStart": {
       "JP": "メソッド開始: ${METHOD_NAME}",
       "EN": "Method start: ${METHOD_NAME}",
       "CN": "方法开始: ${METHOD_NAME}",
@@ -83,7 +83,7 @@
         }
       }
     },
-    "methodEnd": {
+    "MethodEnd": {
       "JP": "メソッド終了: ${METHOD_NAME}",
       "EN": "Method end: ${METHOD_NAME}",
       "CN": "方法结束: ${METHOD_NAME}",
@@ -93,7 +93,7 @@
         }
       }
     },
-    "methodNotFound": {
+    "MethodNotFound": {
       "JP": "メソッドなし: ${METHOD_NAME}",
       "EN": "Method not found: ${METHOD_NAME}",
       "CN": "未发现方法: ${METHOD_NAME}",

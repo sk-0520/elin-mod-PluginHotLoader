@@ -40,9 +40,17 @@ namespace Elin.Plugin.Main.PluginHelpers
         /// <see cref="BepInEx"/>の提供するロガー。
         /// </summary>
         public static ManualLogSource Logger { get; private set; } = default!;
-        public static SynchronizationContext Context { get; private set; } = default!;
+        public static SynchronizationContext Context { get; set; } = default!;
+        /// <summary>
+        /// メッセージ出力ヘルパー。
+        /// </summary>
+        public static MessageHelper Message { get; private set; } = default!;
 
 #if DEBUG
+        /// <summary>
+        /// ファイル出力ヘルパー。
+        /// </summary>
+        /// <remarks>DEBUG 時のみ有効。</remarks>
         private static FileLogger FileLogger { get; set; } = default!;
 #endif
 
@@ -61,16 +69,6 @@ namespace Elin.Plugin.Main.PluginHelpers
         /// 共通的な処理。
         /// </summary>
         internal static CommonHelper Common { get; } = new CommonHelper();
-
-        /// <summary>
-        /// メッセージ出力可能なシーンか。
-        /// </summary>
-        public static bool CanOutputMessage => Scene.scene.mode switch
-        {
-            Scene.Mode.Zone => true,
-            Scene.Mode.StartGame => true,
-            _ => false,
-        };
 
         #endregion
 
@@ -99,6 +97,7 @@ namespace Elin.Plugin.Main.PluginHelpers
             Plugin = plugin;
             Logger = logger;
             Context = context;
+            Message = new MessageHelper(context);
 
 #if DEBUG
             FileLogger = new FileLogger(Mod.LogFile);
@@ -191,20 +190,6 @@ namespace Elin.Plugin.Main.PluginHelpers
             action();
         }
 
-        private static void DoMessage(Action action)
-        {
-            if (!CanOutputMessage)
-            {
-                return;
-            }
-
-            // TODO: とりあえず全部 Post に投げ込んでいるが、同期スレッドで実行している場合の分岐とかあった方がいい, 一旦今はこれでいい
-            Context.Post(static a =>
-            {
-                ((Action)a)();
-            }, action);
-        }
-
         /// <summary>
         /// 開発ログ出力。
         /// </summary>
@@ -224,52 +209,44 @@ namespace Elin.Plugin.Main.PluginHelpers
                 return;
             }
 
-            var timestamp = DateTime.Now.ToString("O");
-
-            var text = s switch
-            {
-                null => "<null>",
-                string str => str,
-                _ => s.ToString() ?? "<s:null>"
-            };
-
-
+            var timestamp = Message.ToTimestamp(DateTime.Now);
+            var header = Message.ToLogHeader(timestamp, callerMemberName, callerFilePath, callerLineNumber);
+            var data = Message.ToLogData(s);
 #if DEBUG
             if (outputLogFile)
             {
                 if (Mod.IsEnabledLogFile)
                 {
                     var lines = new[] {
-                    $"[{timestamp}] {callerMemberName} <{Path.GetFileName(callerFilePath)}:{callerLineNumber}>",
-                        text
+                        header,
+                        data,
                     };
                     FileLogger.Log(lines);
                 }
             }
 #endif
-            Logger.LogDebug($"[{timestamp}] {callerMemberName} <{Path.GetFileName(callerFilePath)}:{callerLineNumber}>: {text}");
+            Logger.LogDebug($"{header}: {data}");
 
             if (outputMessage)
             {
-                var lines = text.SplitNewline();
-                DoMessage(() =>
+                var lines = data.SplitNewline();
+                Message.DoMessage(() =>
                 {
-                    var originalColor = Msg.currentColor;
-                    try
+                    using (Message.PreserveColor())
                     {
                         Msg.NewLine();
+
+                        // 本メソッドはユーザー向けではなく実装者向けのため、Package.Title ではなく Mod.Name を使用する
+                        // 膨大なログが表示されていても、それが Mod.Name となっていればリリース版には表示されないため、誤ってリリース版にログを混入させたかどうかの不安は減る
+                        // デバッグ版をリリースしたのであれば知らない。。。
                         Msg.SetColor(Color.cyan);
-                        Msg.SayRaw($"<{Package.Title}> ");
+                        Msg.SayRaw($"<{Mod.Name}> ");
+
                         Msg.SetColor(color);
                         foreach (var line in lines)
                         {
-                            Msg.SayRaw(line);
-                            Msg.NewLine();
+                            Message.OutputLineWithoutContext(line);
                         }
-                    }
-                    finally
-                    {
-                        Msg.SetColor(originalColor);
                     }
                 });
             }
@@ -342,8 +319,8 @@ namespace Elin.Plugin.Main.PluginHelpers
         /// <param name="callerLineNumber"></param>
         public static void LogNotExpected(IEnumerable<string> lines, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            var timestamp = DateTime.Now.ToString("O");
-            var header = $"[{timestamp}] {callerMemberName} <{Path.GetFileName(callerFilePath)}:{callerLineNumber}>";
+            var timestamp = Message.ToTimestamp(DateTime.Now);
+            var header = Message.ToLogHeader(timestamp, callerMemberName, callerFilePath, callerLineNumber);
 #if DEBUG
             if (Mod.IsEnabledLogFile)
             {
@@ -356,24 +333,17 @@ namespace Elin.Plugin.Main.PluginHelpers
 #endif
             Logger.LogError($"{header}: {string.Join(Environment.NewLine, lines)}");
 
-            DoMessage(() =>
+            Message.DoMessage(() =>
             {
-                var originalColor = Msg.currentColor;
-                try
+                using (Message.UseColor(Color.yellow))
                 {
                     Msg.NewLine();
-                    Msg.SetColor(Color.yellow);
-                    Msg.SayRaw($"-------- {Package.Title}:NotExpected --------");
+                    Msg.SayRaw($"!!!! {Package.Title}:NotExpected !!!!");
                     Msg.SayRaw($"[{callerMemberName}] {Path.GetFileName(callerFilePath)}:{callerLineNumber}");
                     foreach (var line in lines)
                     {
-                        Msg.SayRaw(line);
-                        Msg.NewLine();
+                        Message.OutputLineWithoutContext(line);
                     }
-                }
-                finally
-                {
-                    Msg.currentColor = originalColor;
                 }
             });
         }
@@ -419,33 +389,17 @@ namespace Elin.Plugin.Main.PluginHelpers
 #endif
             if (outputMessage)
             {
-                DoMessage(() =>
+                Message.DoMessage(() =>
                 {
-                    var originalColor = Msg.currentColor;
-                    try
+                    using (Message.PreserveColor())
                     {
-                        var color = logLevel switch
-                        {
-                            LogLevel.Debug => Color.gray,
-                            LogLevel.Info => Color.blue,
-                            LogLevel.Message => Color.white,
-                            LogLevel.Warning => Color.yellow,
-                            LogLevel.Error => Color.red,
-                            LogLevel.Fatal => new Color(0.5f, 0, 0),
-                            _ => Color.green,
-                        };
+                        var color = Message.GetLogLevelColor(logLevel);
 
                         Msg.SetColor(Color.cyan);
                         Msg.SayRaw($"<{Package.Title}> ");
 
                         Msg.SetColor(color);
-                        Msg.SayRaw(message);
-
-                        Msg.NewLine();
-                    }
-                    finally
-                    {
-                        Msg.SetColor(originalColor);
+                        Message.OutputLineWithoutContext(message);
                     }
                 });
             }
