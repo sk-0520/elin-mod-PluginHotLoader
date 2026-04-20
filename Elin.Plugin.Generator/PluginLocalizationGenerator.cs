@@ -161,22 +161,10 @@ namespace Elin.Plugin.Generator
             // 実装メモ: Elin 側で言語周りの調整してくれると思ってたんだが、
             // Lang/ の扱いとか実装見てるとなんかそうでもなさそうだったので作成
 
-            var define = context.AdditionalTextsProvider
-                .Where(file => Path.GetFileName(file.Path) == GeneratorConstants.LocalizeFileName)
-                .Select((file, _) => file.GetText()?.ToString())
-                .Where(a => a != null)
-                .Select((text, _) =>
-                {
-                    return System.Text.Json.JsonSerializer.Deserialize<LocalizationDefine>(text!, new System.Text.Json.JsonSerializerOptions()
-                    {
-                        PropertyNameCaseInsensitive = true,
-                        AllowTrailingCommas = true,
-                        ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip,
-                    });
-                })
-                .Collect()
-                .Select((list, _) => list.FirstOrDefault())
-            ;
+            var define = SourceGeneratorHelper.CollectJsonClass<LocalizationDefine>(
+                context.AdditionalTextsProvider,
+                file => Path.GetFileName(file.Path) == GeneratorConstants.LocalizeFileName
+            );
 
             context.RegisterSourceOutput(define, (c, define) =>
             {
@@ -191,7 +179,6 @@ namespace Elin.Plugin.Generator
                 //lang=c#
                 var source = $$"""
                 {{sourceBuilder.Header}}
-                #nullable enable
 
                 using System;
                 using System.IO;

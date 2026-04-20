@@ -5,6 +5,13 @@
 	<!-- Mod のアセンブリ名の読み込み -->
 	<Import Project="$(SolutionDir)Elin.Plugin.Main.Assembly.xml" />
 
+	<PropertyGroup>
+		<PowerShellCommand>powershell</PowerShellCommand>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
+		<PowerShellCommand>pwsh</PowerShellCommand>
+	</PropertyGroup>
+
 	<!-- テンプレート側設定項目 -->
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
@@ -28,7 +35,7 @@
 		<AdditionalFiles Include="$(SolutionDir)Plugin.json" />
 		<AdditionalFiles Include="$(SolutionDir)Localization.json" />
 		<AdditionalFiles Include="$(SolutionDir)Plugin.dev.json" Condition="Exists('$(SolutionDir)Plugin.dev.json')" />
-		
+
 		<CompilerVisibleProperty Include="ElinPath" />
 		<CompilerVisibleProperty Include="AssemblyName" />
 	</ItemGroup>
@@ -43,17 +50,17 @@
 
 	<Target Name="ConvertPreviewImage" AfterTargets="AfterBuild" Condition="Exists('$(ProjectDir)@Assets\preview.png')">
 		<Message Text="ConvertPreviewImage: $(AssemblyName)" Importance="Normal" />
-		<Exec Command="powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(SolutionDir)dev-items\convert-preview-image.ps1&quot; -Source &quot;$(ProjectDir)@Assets\preview.png&quot; -Out &quot;$(ProjectDir)@Assets\preview.jpg&quot;" WorkingDirectory="$(SolutionDir)" IgnoreExitCode="false" />
+		<Exec Command="$(PowerShellCommand) -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(SolutionDir)dev-items\convert-preview-image.ps1&quot; -Source &quot;$(ProjectDir)@Assets\preview.png&quot; -Out &quot;$(ProjectDir)@Assets\preview.jpg&quot;" WorkingDirectory="$(SolutionDir)" IgnoreExitCode="false" />
 	</Target>
 
 	<Target Name="ExtractPackageXml" AfterTargets="AfterBuild">
 		<Message Text="ExtractPackageXml: $(AssemblyName)" Importance="Normal" />
-		<Exec Command="powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(SolutionDir)dev-items\extract-package-xml.ps1&quot; -Assembly &quot;$(ProjectDir)$(OutputPath)$(AssemblyName).dll&quot; -Out &quot;$(ProjectDir)@Assets\package.xml&quot;" WorkingDirectory="$(SolutionDir)" IgnoreExitCode="false" />
+		<Exec Command="$(PowerShellCommand) -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(SolutionDir)dev-items\extract-package-xml.ps1&quot; -Assembly &quot;$(ProjectDir)$(OutputPath)$(AssemblyName).dll&quot; -Out &quot;$(ProjectDir)@Assets\package.xml&quot;" WorkingDirectory="$(SolutionDir)" IgnoreExitCode="false" />
 	</Target>
 
 	<Target Name="BuildModHelp" AfterTargets="AfterBuild" DependsOnTargets="ExtractPackageXml" Condition="Exists('$(ProjectDir)@Assets\ModHelp\help.xhtml')">
 		<Message Text="BuildModHelp: $(AssemblyName)" Importance="Normal" />
-		<Exec Command="powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(SolutionDir)dev-items\build-mod-help-xml.ps1&quot; -Source &quot;$(ProjectDir)@Assets\ModHelp&quot; -Out &quot;$(ProjectDir)@Assets&quot;" WorkingDirectory="$(SolutionDir)" IgnoreExitCode="false" />
+		<Exec Command="$(PowerShellCommand) -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(SolutionDir)dev-items\build-mod-help-xml.ps1&quot; -Source &quot;$(ProjectDir)@Assets\ModHelp&quot; -Out &quot;$(ProjectDir)@Assets&quot;" WorkingDirectory="$(SolutionDir)" IgnoreExitCode="false" />
 	</Target>
 
 	<Target Name="CopyFiles" AfterTargets="AfterBuild" DependsOnTargets="ConvertPreviewImage;BuildModHelp">

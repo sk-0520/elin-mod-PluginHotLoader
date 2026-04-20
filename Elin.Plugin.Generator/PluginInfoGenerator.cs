@@ -1,48 +1,19 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
 using System;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 
 namespace Elin.Plugin.Generator
 {
     [Generator(LanguageNames.CSharp)]
     internal class PluginInfoGenerator : IIncrementalGenerator
     {
-        #region property
+        #region function
 
-        private JsonSerializerOptions JsonSerializerOptions = new System.Text.Json.JsonSerializerOptions()
+        private static IncrementalValueProvider<PluginMacro> CollectMacro(IncrementalValueProvider<AnalyzerConfigOptionsProvider> analyzerConfigOptionsProvider)
         {
-            PropertyNameCaseInsensitive = true,
-            AllowTrailingCommas = true,
-            ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip,
-        };
-
-        #endregion
-
-        #region IIncrementalGenerator
-
-        public void Initialize(IncrementalGeneratorInitializationContext context)
-        {
-            var define = context.AdditionalTextsProvider
-                .Where(file => Path.GetFileName(file.Path) == GeneratorConstants.PluginInfoFileName)
-                .Select((file, _) => (file: file, json: file.GetText()?.ToString()))
-                .Where(a => a.json != null)
-                .Select((a, _) => JsonSerializer.Deserialize<PluginDefine>(a.json!, JsonSerializerOptions))
-                .Collect()
-                .Select((arr, _) => arr.FirstOrDefault())
-            ;
-
-            var devDefine = context.AdditionalTextsProvider
-                .Where(file => Path.GetFileName(file.Path) == GeneratorConstants.PluginInfoDevFileName)
-                .Select((file, _) => (file: file, json: file.GetText()?.ToString()))
-                .Where(a => a.json != null)
-                .Select((a, _) => JsonSerializer.Deserialize<PluginDevDefine>(a.json!, JsonSerializerOptions))
-                .Collect()
-                .Select((arr, _) => arr.FirstOrDefault())
-            ;
-
-            var macroProvider = context.AnalyzerConfigOptionsProvider
+            return analyzerConfigOptionsProvider
                 .Select((configOptions, token) =>
                 {
                     var macro = new PluginMacro();
@@ -60,6 +31,25 @@ namespace Elin.Plugin.Generator
                     return macro;
                 })
             ;
+        }
+
+        #endregion
+
+        #region IIncrementalGenerator
+
+        public void Initialize(IncrementalGeneratorInitializationContext context)
+        {
+            var define = SourceGeneratorHelper.CollectJsonClass<PluginDefine>(
+                context.AdditionalTextsProvider,
+                file => Path.GetFileName(file.Path) == GeneratorConstants.PluginInfoFileName
+            );
+
+            var devDefine = SourceGeneratorHelper.CollectJsonClass<PluginDevDefine>(
+                context.AdditionalTextsProvider,
+                file => Path.GetFileName(file.Path) == GeneratorConstants.PluginInfoDevFileName
+            );
+
+            var macroProvider = CollectMacro(context.AnalyzerConfigOptionsProvider);
 
             context.RegisterSourceOutput(define.Combine(devDefine).Combine(macroProvider), (c, x) =>
             {

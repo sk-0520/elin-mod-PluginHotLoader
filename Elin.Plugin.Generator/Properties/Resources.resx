@@ -183,4 +183,10 @@
   <data name="EPG011_B_Message" xml:space="preserve">
     <value>Please set the assembly name in Directory.Build.props.user</value>
   </data>
+  <data name="EPG012_A_Title" xml:space="preserve">
+    <value>JSON!</value>
+  </data>
+  <data name="EPG012_B_Message" xml:space="preserve">
+    <value>JSON!</value>
+  </data>
 </root>

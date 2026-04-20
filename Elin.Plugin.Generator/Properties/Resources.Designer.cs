@@ -257,5 +257,23 @@ namespace Elin.Plugin.Generator.Properties {
                 return ResourceManager.GetString("EPG011_B_Message", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   JSON! に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EPG012_A_Title {
+            get {
+                return ResourceManager.GetString("EPG012_A_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   JSON! に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string EPG012_B_Message {
+            get {
+                return ResourceManager.GetString("EPG012_B_Message", resourceCulture);
+            }
+        }
     }
 }
