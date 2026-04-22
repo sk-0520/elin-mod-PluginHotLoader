@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -72,6 +72,8 @@ namespace Elin.Plugin.Generator
         public Dictionary<string, LocalizationItem> General { get; set; } = new Dictionary<string, LocalizationItem>();
         [JsonPropertyName("format")]
         public Dictionary<string, LocalizationItem> Format { get; set; } = new Dictionary<string, LocalizationItem>();
+        [JsonPropertyName("config")]
+        public Dictionary<string, LocalizationItem> Config { get; set; } = new Dictionary<string, LocalizationItem>();
 
         #endregion
     }
