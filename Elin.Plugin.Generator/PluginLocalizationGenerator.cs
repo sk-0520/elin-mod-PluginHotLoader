@@ -84,8 +84,8 @@ namespace Elin.Plugin.Generator
         IXmlDocumentNode GenerateLanguageSamples(XmlNodeGenerator generator, LocalizationItem item)
         {
             return generator.Table(
-                new KeyValuePair<string, string>("言語", "翻訳"),
-                item.Languages.Select(a => new KeyValuePair<string, string>(a.Key, a.Value ?? string.Empty))
+                new KeyValuePair<string, string>(Properties.Resources.DocLangTransLanguage, Properties.Resources.DocLangTransTranslation),
+                item.Languages.Select(a => new KeyValuePair<string, string>(a.Key, a.Value ?? Properties.Resources.DocLangTransUndefined))
             );
         }
 

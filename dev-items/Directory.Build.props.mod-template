@@ -14,8 +14,6 @@
 		<AnalysisMode>All</AnalysisMode>
 
 		<LangVersion>latest</LangVersion>
-		<!-- ISymbol.GetDocumentationCommentXml を使用するためだけのドキュメント生成 -->
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">

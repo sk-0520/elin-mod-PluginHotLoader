@@ -126,7 +126,7 @@ namespace Elin.Plugin.Main.PluginHelpers
 #endif
         }
 
-        public static string ToStringFromInformation()
+        public static string GetInformationString()
         {
             static string ToStringFrom(Type type)
             {

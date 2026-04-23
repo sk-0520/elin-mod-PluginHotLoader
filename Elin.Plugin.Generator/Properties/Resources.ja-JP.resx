@@ -189,4 +189,13 @@
   <data name="EPG012_B_Message" xml:space="preserve">
     <value>JSON!</value>
   </data>
+  <data name="DocLangTransLanguage" xml:space="preserve">
+    <value>言語</value>
+  </data>
+  <data name="DocLangTransTranslation" xml:space="preserve">
+    <value>翻訳</value>
+  </data>
+  <data name="DocLangTransUndefined" xml:space="preserve">
+    <value>&lt;未定義&gt;</value>
+  </data>
 </root>

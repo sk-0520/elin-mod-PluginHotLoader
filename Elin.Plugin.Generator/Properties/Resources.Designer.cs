@@ -61,6 +61,33 @@ namespace Elin.Plugin.Generator.Properties {
         }
         
         /// <summary>
+        ///   Language に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string DocLangTransLanguage {
+            get {
+                return ResourceManager.GetString("DocLangTransLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Translation に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string DocLangTransTranslation {
+            get {
+                return ResourceManager.GetString("DocLangTransTranslation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   &lt;Undefined&gt; に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string DocLangTransUndefined {
+            get {
+                return ResourceManager.GetString("DocLangTransUndefined", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cannot apply attribute to a nested type に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string EPG001_A_Title {
