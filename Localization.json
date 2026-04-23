@@ -105,5 +105,20 @@
     }
   },
   "config": {
+    "IsEnabled": {
+      "JP": "本 Mod を有効にするか",
+      "EN": "Enable this mod",
+      "CN": "启用此 Mod"
+    },
+    "PluginId": {
+      "JP": "監視対象のプラグインID(package.xml: //Meta/id)",
+      "EN": "Plugin ID to monitor (package.xml: //Meta/id)",
+      "CN": "要监视的插件 ID (package.xml: //Meta/id)"
+    },
+    "DelayTime": {
+      "JP": "更新検知から再読み込みまでの遅延時間",
+      "EN": "Delay time from update detection to reload",
+      "CN": "从更新检测到重新加载的延迟时间"
+    }
   }
 }

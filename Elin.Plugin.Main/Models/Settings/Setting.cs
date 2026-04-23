@@ -18,16 +18,19 @@ namespace Elin.Plugin.Main.Models.Settings
         /// <summary>
         /// 有効か。
         /// </summary>
+        [GeneratePluginConfigDescription(nameof(PluginLocalizationConfig.IsEnabled), AllLanguage = true)]
         public virtual bool IsEnabled { get; set; } = true;
 
         /// <summary>
         /// 対象のプラグインID。
         /// </summary>
+        [GeneratePluginConfigDescription(nameof(PluginLocalizationConfig.PluginId), AllLanguage = true)]
         public virtual string PluginId { get; set; } = string.Empty;
 
         /// <summary>
         /// 更新検知から再読み込みまでの遅延時間（1.5で1.5秒）
         /// </summary>
+        [GeneratePluginConfigDescription(nameof(PluginLocalizationConfig.DelayTime), AllLanguage = true)]
         [RangePluginConfig(0.5, 30)]
         public virtual double PrimitiveDelayTime { get; set; } = TimeSpan.FromSeconds(3).TotalSeconds;
 
