@@ -5,7 +5,6 @@ using Elin.Plugin.Generated;
 using Elin.Plugin.Main.Models;
 using Elin.Plugin.Main.Models.Settings;
 using Elin.Plugin.Main.PluginHelpers;
-using HarmonyLib;
 using System.Linq;
 
 namespace Elin.Plugin.Main
@@ -13,8 +12,6 @@ namespace Elin.Plugin.Main
     partial class Plugin
     {
         #region property
-
-        private Harmony? Harmony { get; set; }
 
         private PluginWatcher? PluginWatcher { get; set; }
 
@@ -25,11 +22,9 @@ namespace Elin.Plugin.Main
         /// <summary>
         /// 起動時のプラグイン独自処理。
         /// </summary>
-        /// <param name="harmony"></param>
-        private void AwakePlugin(Harmony harmony)
+        private void AwakePlugin()
         {
             Setting.Instance = Setting.Bind(Config, new Setting());
-            Harmony = harmony;
             CallPatchAll = false;
         }
 

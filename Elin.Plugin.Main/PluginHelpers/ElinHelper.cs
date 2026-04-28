@@ -45,4 +45,32 @@ namespace Elin.Plugin.Main.PluginHelpers
 
         #endregion
     }
+
+    public static class ElinHelperExtensions
+    {
+        #region function
+
+        /// <inheritdoc cref="ElinHelper.IsDefenseGame(Zone)"/>
+        /// <remarks>現在状態を使用する。</remarks>
+        public static bool IsDefenseGameForCurrent(this ElinHelper helper)
+        {
+            return helper.IsDefenseGame(EMono._zone);
+        }
+
+        /// <inheritdoc cref="ElinHelper.IsGlobalMap(Scene, Zone)"/>
+        /// <remarks>現在状態を使用する。</remarks>
+        public static bool IsGlobalMapForCurrent(this ElinHelper helper)
+        {
+            return helper.IsGlobalMap(EMono.scene, EMono._zone);
+        }
+
+        /// <inheritdoc cref="ElinHelper.IsSelfZone(Zone)"/>
+        /// <remarks>現在状態を使用する。</remarks>
+        public static bool IsSelfZoneForCurrent(this ElinHelper helper)
+        {
+            return helper.IsSelfZone(EMono._zone);
+        }
+
+        #endregion
+    }
 }

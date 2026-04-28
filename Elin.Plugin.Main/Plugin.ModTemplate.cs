@@ -2,7 +2,10 @@ using BepInEx;
 using Elin.Plugin.Generated;
 using Elin.Plugin.Main.PluginHelpers;
 using HarmonyLib;
+using System;
 using System.Threading;
+
+// このファイルはテンプレート管理のため編集しないでください。
 
 namespace Elin.Plugin.Main
 {
@@ -12,12 +15,19 @@ namespace Elin.Plugin.Main
         #region property
 
         /// <summary>
-        /// <see cref="Harmony.PatchAll()"/>を呼び出すか。
+        /// <see cref="AwakePlugin"/> 後に <see cref="Harmony.PatchAll()"/> を呼び出すか。
         /// </summary>
         /// <remarks>
-        /// <para>デフォルトの<see langword="true"/>で問題ない。</para>
+        /// <para>デフォルト値の <see langword="true"/> で問題ない。</para>
+        /// <para>テンプレートでは <see cref="AwakePlugin"/> による構築を前提としており、<c>Start</c> メソッドまでは面倒を見ない。</para>
         /// </remarks>
         private bool CallPatchAll { get; set; } = true;
+
+        /// <summary>
+        /// <see cref="HarmonyLib.Harmony"/> のインスタンス。
+        /// </summary>
+        /// <remarks>テンプレート側で初期化、破棄される。</remarks>
+        private Harmony Harmony { get; } = new Harmony(Package.Id);
 
         #endregion
 
@@ -26,24 +36,28 @@ namespace Elin.Plugin.Main
         /// <summary>
         /// 起動。
         /// </summary>
-        /// <remarks>本メソッドではインフラ面の構築も行っているため、プラグインとしての起動処理は <see cref="AwakePlugin(Harmony)"/> で実施する。</remarks>
+        /// <remarks>本メソッドではインフラ面の構築も行っているため、プラグインとしての起動処理は <see cref="AwakePlugin()"/> で実施すること。</remarks>
         public void Awake()
         {
             ModHelper.Initialize(this, Logger, SynchronizationContext.Current);
 
-            var harmony = new Harmony(Package.Id);
-
-            AwakePlugin(harmony);
+            AwakePlugin();
 
             if (CallPatchAll)
             {
-                harmony.PatchAll();
+                Harmony.PatchAll();
             }
         }
 
         public void OnDestroy()
         {
             OnDestroyPlugin();
+
+            if (Harmony is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+
             ModHelper.Destroy();
         }
 
