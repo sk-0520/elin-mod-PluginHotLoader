@@ -55,7 +55,7 @@ namespace Elin.Plugin.Main
 
             if (string.IsNullOrWhiteSpace(setting.PluginId))
             {
-                ModHelper.WriteDev(ModHelper.Lang.General.PluginIdNotSet);
+                ModHelper.LogNotify(BepInEx.Logging.LogLevel.Warning, ModHelper.Lang.General.PluginIdNotSet);
                 return;
             }
 
@@ -67,13 +67,13 @@ namespace Elin.Plugin.Main
             var plugin = FindPlugin(setting.PluginId);
             if (plugin is not null)
             {
-                ModHelper.WriteDev(ModHelper.Lang.Formatter.FormatPluginFound(pluginId: setting.PluginId));
+                ModHelper.LogNotify(BepInEx.Logging.LogLevel.Info, ModHelper.Lang.Formatter.FormatPluginFound(pluginId: setting.PluginId));
                 PluginWatcher = new PluginWatcher(setting);
                 PluginWatcher.Register(plugin);
             }
             else
             {
-                ModHelper.WriteDev(ModHelper.Lang.Formatter.FormatPluginNotFound(pluginId: setting.PluginId));
+                ModHelper.LogNotify(BepInEx.Logging.LogLevel.Error, ModHelper.Lang.Formatter.FormatPluginNotFound(pluginId: setting.PluginId));
             }
         }
 
